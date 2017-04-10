@@ -5,26 +5,30 @@ var Environment = {
 	spritesData : null,
 	spriteSize : 0,
 	spriteLoading : false,
+	viewPort: null,
 
-	initializeProperties: function(spritesFilename, spritesData, spriteSize){
+	/**
+	 * initialize the object with the required data
+	 */
+	initializeProperties: function(spritesFilename, spritesData, spriteSize, viewPort){
 		this.spritesData = spritesData;
 		this.spriteSize = spriteSize;
+		this.viewPort = viewPort;
 		this.createBufferCanvas();
-		this.createGrid();
+		this.createRandomGrid();
 		this.loadSprites(spritesFilename);
 	},
 	/**
 	 * random initialization for now
 	 */
-	createGrid: function(){
-		for(i = 0; i < 100; i++){
+	createRandomGrid: function(){
+		for(i = 0; i < 50; i++){
 			this.grid.push([]);
-			for(j= 0; j < 100; j++){
-				randomSpriteId = (Math.random() * 10) > 7 ? 0:1;
+			for(j= 0; j < 50; j++){
+				randomSpriteId = (Math.random() * 10) > 8 ? 1:0;
 				this.grid[i].push(
 					{
-						spriteId: randomSpriteId,
-						isAccesible: true
+						spriteId: randomSpriteId
 					}
 				);
 			}
@@ -50,20 +54,32 @@ var Environment = {
 	 */
 	createBufferCanvas: function(){
 		this.backgroundCanvas = document.createElement('canvas');
-		this.backgroundCanvas.width = 60*this.spriteSize;
-		this.backgroundCanvas.height = 60*this.spriteSize;
-		//this.backgroundCanvas.getContext("2d").fillStyle = "rgb(255,255,255)";
-		//this.backgroundCanvas.getContext("2d").fillRect (0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
+		this.backgroundCanvas.setAttribute("id", "backgroundCanvas");
+		this.backgroundCanvas.width = (this.spriteSize*50);
+		this.backgroundCanvas.height = (this.spriteSize*50);
 	},
 
 	render : function(displayCanvas){
 		if(!this.spriteLoading){
 			if(this.isBackgroungCanvasReady){
 				//refresh the background
-				displayCanvas.getContext('2d').drawImage(this.backgroundCanvas,0,0);
+				displayCanvas.getContext('2d').drawImage(
+					this.backgroundCanvas,
+					this.viewPort.x,
+					this.viewPort.y,
+					this.viewPort.width,
+					this.viewPort.height,
+					0,
+					0,
+					this.viewPort.width,
+					this.viewPort.height);
+					/*displayCanvas.getContext('2d').drawImage(
+					this.backgroundCanvas,
+					0,
+					0);*/
 			}else{
-				for(i = 0; i < 100; i++){
-					for(j= 0; j < 100; j++){
+				for(i = 0; i < this.grid.length; i++){
+					for(j= 0; j < this.grid[i].length; j++){
 						this.backgroundCanvas.getContext('2d').drawImage(
 							this.spriteCanvas,
 							this.spritesData[this.grid[i][j].spriteId].x*this.spriteSize, 
@@ -77,10 +93,30 @@ var Environment = {
 						);
 					}
 				}
+				//document.body.appendChild(this.backgroundCanvas);
 				this.isBackgroungCanvasReady = true;
 			}
 		}else{
 			this.isBackgroungCanvasReady = false;
+		}
+	},
+	/**
+	 * scrolling implementation: center the map on the (x,y)
+	 */
+	moveViewPort: function(x, y, xOffset, yOffset){
+		if(x < this.viewPort.width/2){
+			console.log("player reached left limit for scrolling");
+		}else if(x > (this.backgroundCanvas.width-this.viewPort.width/2)){
+			console.log("player reached right limit for scrolling");
+		}else{
+			this.viewPort.x+=xOffset;
+		}
+		if(y < this.viewPort.height/2){
+			console.log("player reached top limit for scrolling");
+		}else if(y > (this.backgroundCanvas.height-this.viewPort.height/2)){
+			console.log("player reached bottom limit for scrolling");
+		}else{
+			this.viewPort.y+=yOffset;
 		}
 	}
 }

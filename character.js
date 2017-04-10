@@ -13,11 +13,13 @@ var Character = {
 	},
 	animationData:[],
 	spriteLoading: false,
+	environment: null,
 
-	initializeProperties: function(spritesFilename, animationData, spriteSize){
+	initializeProperties: function(spritesFilename, animationData, spriteSize, environment){
 		this.animationData = animationData;
 		this.spriteSize = spriteSize;
 		this.loadSprites(spritesFilename);
+		this.environment = environment;
 	},
 
 	loadSprites: function(filename){
@@ -32,24 +34,32 @@ var Character = {
 		drawing.src = filename;
 	},
 
+	changeDirection: function(direction){
+		this.currentState.direction=direction; 
+	},
+
 	animate: function(){
 		if(this.currentState.moving){
 			var sprites = null;
+			var xOffset = 0;
+			var yOffset = 0;
 			switch(this.currentState.direction){
 				case 0 :
-					this.currentState.position.y +=this.currentState.velocity;
+					yOffset = this.currentState.velocity;
 					break;
 				case 1:
-					this.currentState.position.x +=this.currentState.velocity;
+					xOffset = this.currentState.velocity;
 					break;
 				case 2:
-					this.currentState.position.y -=this.currentState.velocity;
+					yOffset = 0 - this.currentState.velocity;
 					break;
 				case 3:
-					this.currentState.position.x -=this.currentState.velocity;
+					xOffset = 0 - this.currentState.velocity;
 					break;
 			}
-			//TODO review the sprites array not initializeds
+			this.environment.moveViewPort(this.currentState.position.x, this.currentState.position.y, xOffset, yOffset);
+			this.currentState.position.x +=xOffset;
+			this.currentState.position.y +=yOffset;
 			this.currentState.frame = (this.currentState.frame+1)%this.animationData[this.currentState.direction].length;
 		}
 	},
@@ -63,8 +73,8 @@ var Character = {
 				spriteCoordinate.y*this.spriteSize,
 				this.spriteSize,
 				this.spriteSize, 
-				this.currentState.position.x, 
-				this.currentState.position.y, 
+				(this.currentState.position.x)-this.environment.viewPort.x, 
+				(this.currentState.position.y)-this.environment.viewPort.y, 
 				this.spriteSize,
 				this.spriteSize
 			);

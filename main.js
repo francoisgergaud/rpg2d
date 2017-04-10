@@ -12,19 +12,19 @@ function registerEventForPlayableCharacter(character){
 			switch(e.keyCode){
 				case 40:
 					//down
-					character.currentState.direction=0; 
+					character.changeDirection(0); 
 					break;
 				case 39: 
 					//right
-					character.currentState.direction=1;
+					character.changeDirection(1);
 					break;
 				case 38:
 					//up
-					character.currentState.direction=2; 
+					character.changeDirection(2); 
 					break;
 				case 37: 
 					//left
-					character.currentState.direction=3; 
+					character.changeDirection(3); 
 					break;
 			}
 			character.currentState.moving = true;
@@ -52,9 +52,20 @@ function mainLoop(animatedElements, environment, displayCanvas){
 }
 
 function game(canvas){
-	var timer;
-	canvas.width = 640;
-	canvas.height = 480;
+	var backgroundSpriteSize = 16;
+	var viewPortWidth = 40;
+	var viewPortHeight = 30;
+	canvas.width = backgroundSpriteSize*viewPortWidth;
+	canvas.height = backgroundSpriteSize*viewPortHeight;
+	//the environment
+	var environment = new Object(Environment);
+	backgroundSpriteData = [
+			{x:0,y:0},
+			{x:1,y:0}
+		];
+	var viewPort = {x:0,y:0,width: canvas.width, height: canvas.height};
+	environment.initializeProperties("./resources/tileset4.png", backgroundSpriteData, backgroundSpriteSize, viewPort);
+	//the playable character
 	var playableCharacter = new Object(Character);
 	var animationData = [
    			[{x:6,y:0},{x:7,y:0},{x:8,y:0}],
@@ -62,15 +73,8 @@ function game(canvas){
    			[{x:6,y:3},{x:7,y:3},{x:8,y:3}],
    			[{x:6,y:1},{x:7,y:1},{x:8,y:1}]
    		];
-	playableCharacter.initializeProperties("./resources/hetalia_sprites_by_carmenmcs.png", animationData, 32);
+	playableCharacter.initializeProperties("./resources/hetalia_sprites_by_carmenmcs.png", animationData, 32, environment);
 	registerEventForPlayableCharacter(playableCharacter);
-	var environment = new Object(Environment);
-	backgroundSpriteData = [
-			{x:0,y:0},
-			{x:1,y:0}
-		];
-	environment.initializeProperties("./resources/tileset4.png", backgroundSpriteData, 16);
-
 	var animatedElements = [playableCharacter];
 	var animationTimer = window.setInterval(mainLoop, animationPeriod, animatedElements, environment, canvas);
 }
