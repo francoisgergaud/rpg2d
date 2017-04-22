@@ -6,6 +6,12 @@ function AnimatedElement() {
 	this._renderer = null;
 
 	/**
+	 * the listeners to be executed when animate method is executed
+	 * @type {Array}
+	 */
+	this._animateListeners = [];
+
+	/**
 	 * register the renderer
 	 * @param  renderer {Renderer} the renderer to register
 	 * @return {None}
@@ -20,4 +26,12 @@ function AnimatedElement() {
 	this.getRenderer = function(){
 		return this._renderer;
 	};
+
+	/**
+	 * add a listener for the animate method
+	 * @param {object} listener listener to add to the list
+	 */
+	this.addAnimateListener = function(listener){
+		this._animateListeners.push(listener);
+	}
 }

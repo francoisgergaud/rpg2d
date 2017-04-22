@@ -58,8 +58,8 @@ function game(canvas){
 			{x:0,y:0},
 			{x:1,y:0}
 		];
-	var viewPort = {x:0,y:0,width: canvas.width, height: canvas.height};
 	var environment = new Environment("./resources/tileset4.png", backgroundSpriteData, backgroundSpriteSize);
+	var camera = new Camera({x:0,y:0,width: canvas.width, height: canvas.height}, environment);
 	//the playable character
 	var animationData = [
    			[{x:6,y:0},{x:7,y:0},{x:8,y:0}],
@@ -69,7 +69,8 @@ function game(canvas){
    		];
 	var playableCharacter = new Character("./resources/hetalia_sprites_by_carmenmcs.png", animationData, 32);
 	registerEventForPlayableCharacter(playableCharacter);
+	camera.track(playableCharacter);
 	var animatedElements = [playableCharacter];
-	var renderer = new Renderer(animatedElements, environment, canvas, viewPort);
-	var animationTimer = window.setInterval(renderer.main.bind(renderer), animationPeriod);
+	var engine = new Engine(animatedElements, environment, canvas, camera, animationPeriod);
+	engine.start();
 }

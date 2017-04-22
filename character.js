@@ -86,10 +86,12 @@ function Character(spritesFilename, animationData, spriteSize){
 					xOffset = 0 - this._currentState.velocity;
 					break;
 			}
-			this.getRenderer().moveViewPort(this._currentState.position.x, this._currentState.position.y, xOffset, yOffset);
+			for(var animateListener of this._animateListeners){
+				animateListener(this._currentState.position.x, this._currentState.position.y, xOffset, yOffset);
+			}
 			this._currentState.position.x +=xOffset;
 			this._currentState.position.y +=yOffset;
-			this._currentState.frame = (this._currentState.frame+1)%this._animationData[this._currentState.direction].length;
+			this._currentState.frame = (this._currentState.frame+1)%this._animationData[this._currentState.direction].length;	
 		}
 	};
 
@@ -98,17 +100,17 @@ function Character(spritesFilename, animationData, spriteSize){
 	 * TODO: review it: should we access the viewPort from here... can it be managed directly in the renederer
 	 * @return {None}
 	 */
-	this.render = function(){
+	this.render = function(viewPort, displayCanvas){
 		if(!this._spriteLoading){
 			var spriteCoordinate = this._animationData[this._currentState.direction][this._currentState.frame];
-			this.getRenderer().getDisplayCanvas().getContext('2d').drawImage(
+			displayCanvas.getContext('2d').drawImage(
 				this._spriteCanvas,
 				spriteCoordinate.x*this._spriteSize, 
 				spriteCoordinate.y*this._spriteSize,
 				this._spriteSize,
 				this._spriteSize, 
-				(this._currentState.position.x)-this.getRenderer().getViewPort().x, 
-				(this._currentState.position.y)-this.getRenderer().getViewPort().y, 
+				(this._currentState.position.x)-viewPort.x, 
+				(this._currentState.position.y)-viewPort.y, 
 				this._spriteSize,
 				this._spriteSize
 			);
