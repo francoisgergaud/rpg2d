@@ -1,9 +1,9 @@
-function Camera (viewPort, environment){
+function Camera (viewPort, scene){
 
 	this._viewPort = viewPort;
 	this._listeners = [];
-	this._environment = environment;
-
+	this._scene = scene;
+	
 
 	this.addListener = function(listener){
 		this._listeners.push(listener);
@@ -49,8 +49,8 @@ function Camera (viewPort, environment){
 	 * @return {None}
 	 */
 	this.animatedElementTrackedMove = function(x, y, xOffset, yOffset){
-		var maxWidth = this._environment.grid.length*this._environment.spriteSize;
-		var maxHeight = this._environment.grid[0].length*this._environment.spriteSize;
+		var maxWidth = this._scene.getEnvironment().grid.length*this._scene.getEnvironment().spriteSize;
+		var maxHeight = this._scene.getEnvironment().grid[0].length*this._scene.getEnvironment().spriteSize;
 		var viewPortCenterX = this._viewPort.width/2 ;
 		var viewPortCenterY = this._viewPort.height/2 ;
 		if((xOffset != 0 && x > viewPortCenterX  && x < (maxWidth-viewPortCenterX)) 
@@ -58,5 +58,7 @@ function Camera (viewPort, environment){
 			this.moveViewPort(xOffset, yOffset);
 		}
 	};
+
+	this.track(scene.getPlayableCharacter());
 
 }

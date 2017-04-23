@@ -3,7 +3,7 @@
  */
 function AnimatedElement() {
 	/** @type {Renderer} the renderer used to process the animated element */
-	this._renderer = null;
+	this._scene = null;
 
 	/**
 	 * the listeners to be executed when animate method is executed
@@ -12,19 +12,20 @@ function AnimatedElement() {
 	this._animateListeners = [];
 
 	/**
-	 * register the renderer
-	 * @param  renderer {Renderer} the renderer to register
+	 * register the scene for this animated_element to be able to interact with other elements. This method is 
+	 * called by the engine when processing/initializing the scene
+	 * @param  scene {Scene} the scene to register
 	 * @return {None}
 	 */
-	this.registerRenderer = function(renderer){
-		this._renderer = renderer;
+	this._registerScene = function(scene){
+		this._scene = scene;
 	};
 
 	/**
-	 * @return {Renderer} the renderer used for this animated element
+	 * @return {Scene} the scene used for this animated element
 	 */
-	this.getRenderer = function(){
-		return this._renderer;
+	this.getScene = function(){
+		return this._scene;
 	};
 
 	/**

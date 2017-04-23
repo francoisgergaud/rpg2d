@@ -1,13 +1,12 @@
 /**
  * the engine. contains the the main loop with process the events and render the scene
- * @param {[type]} _animatedElements animated-elements which are part of the scene
- * @param {[type]} _environment      environment for the scene
- * @param {[type]} _displayCanvas    the canvas where the scene will be rendered
- * @param {[type]} camera         the view-port (to manage camera moves)
+ * @param {Scene} _scene the scene (contains animated-elements, environment...)
+ * @param {HTML canvas} _displayCanvas    the canvas where the scene will be rendered
+ * @param {Camera} camera         the view-port (to manage camera moves)
+ * @param {integer} animationInterval   the timer in milliseconds use to triger the scene´s animated elements update
  */
-function Engine (animatedElements, environment, displayCanvas, camera, animationInterval){
-	this._animatedElements = animatedElements;
-	this._environment = environment;
+function Engine (scene, displayCanvas, camera, animationInterval){
+	this._scene = scene;
 	this._displayCanvas = displayCanvas;
 	this._camera = camera;
 	this._backgroundBuffer = null;
@@ -18,10 +17,8 @@ function Engine (animatedElements, environment, displayCanvas, camera, animation
 	 * @return {None}
 	 */
 	this._initialize = function(){
-		for(var animatedElement of this._animatedElements){
-			animatedElement.registerRenderer(this);
-		}
-		this._backgroundBuffer = new scrollingCanvasBuffer(this._environment, this._displayCanvas, this._camera);
+		this._scene.getPlayableCharacter()._registerScene(this._scene);
+		this._backgroundBuffer = new scrollingCanvasBuffer(this._scene.getEnvironment(), this._displayCanvas, this._camera);
 	};
 
 	/**
@@ -30,17 +27,25 @@ function Engine (animatedElements, environment, displayCanvas, camera, animation
 	 */
 	this.mainLoop = function(){
 		//update tha animated elements
-		for(var animatedElement of this._animatedElements){
-			animatedElement.animate();
-		}
+		this._scene.getPlayableCharacter().animate();
+		 window.requestAnimationFrame(this._render.bind(this));
+	};
+
+	/**
+	 * render the scene
+	 * @return {None}
+	 */
+	this._render = function(){
 		//render the environment
 		this._backgroundBuffer.render(this._camera.getViewPort(), this._displayCanvas);
 		//render the animated elements
-		for(var animatedElement of this._animatedElements){
-			animatedElement.render(this._camera.getViewPort(), this._displayCanvas);
-		}
-	};
+		this._scene.getPlayableCharacter().render(this._camera.getViewPort(), this._displayCanvas);
+	}
 
+	/**
+	 * start the engine. It basically start a loop which animate and render the elements
+	 * @return {None}
+	 */
 	this.start = function(){
 		this.animationTimer = window.setInterval(this.mainLoop.bind(this), this._animationInterval);
 	}
@@ -66,8 +71,8 @@ function Engine (animatedElements, environment, displayCanvas, camera, animation
 	 * getter for the environment
 	 * @return {object} the environment: {x: integer,y: integer, width: integer, height: integer;}
 	 */
-	this.getEnvironment = function(){
-		return this._environment;
+	this.getScene = function(){
+		return this._scene;
 	};
 
 	this._initialize();

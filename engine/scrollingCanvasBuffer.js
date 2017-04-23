@@ -84,7 +84,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			0
 		);
 		//and add the missing right part
-		var gridColumnIndex = this.backgroundViewPort.x;
+		var gridColumnIndex = this.backgroundViewPort.x-1;
 		for(j=0; j< this._environment.grid[gridColumnIndex].length; j++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
@@ -207,7 +207,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToRight();
 		}
-		if(xSpriteDistance == -1){
+		if(this.backgroundViewPort.x > 0 && xSpriteDistance == -1){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToLeft();
 		}
@@ -216,7 +216,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToBottom();
 		}
-		if(ySpriteDistance == -1){
+		if(this.backgroundViewPort.y > 0 && ySpriteDistance == -1){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToTop();
 		}
