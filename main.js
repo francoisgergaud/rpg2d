@@ -2,7 +2,7 @@
  * the size of a grid element in pixels
  */
 var gridBlockSize = 16;
-var animationPeriod = 50;
+var animationPeriod = 40;
 
 /**
  * initialize the game

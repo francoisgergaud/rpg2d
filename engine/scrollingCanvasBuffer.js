@@ -56,7 +56,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//and add the missing right part
 		var gridColumnIndex = this.backgroundViewPort.x+this.backgroundViewPort.width -1;
 		console.log("fetch grid-column: "+gridColumnIndex);
-		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y); j++){
+		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y-1); j++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -87,7 +87,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//and add the missing right part
 		var gridColumnIndex = this.backgroundViewPort.x-1;
 		console.log("fetch grid-column: "+gridColumnIndex);
-		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y); j++){
+		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y-1); j++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -118,7 +118,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y+this.backgroundViewPort.height -1;
 		console.log("fetch grid-line: "+gridLineIndex);
-		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x); i++){
+		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x-1); i++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -149,7 +149,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y-1;
 		console.log("fetch grid-line: "+gridLineIndex);
-		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x); i++){
+		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x-1); i++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,

@@ -23,7 +23,7 @@ function Camera (viewPort, scene){
 		}
 		this._viewPort.x+=xOffset;
 		this._viewPort.y+=yOffset;
-		console.log("move viewPort to x: "+this._viewPort.x+", y:"+this._viewPort.y)
+		//console.log("move viewPort to x: "+this._viewPort.x+", y:"+this._viewPort.y)
 	};
 
 	/**
@@ -54,7 +54,7 @@ function Camera (viewPort, scene){
 		var maxHeight = Math.floor(this._scene.getEnvironment().grid[0].length*this._scene.getEnvironment().spriteSize);
 		var viewPortCenterX = this._viewPort.width/2 ;
 		var viewPortCenterY = this._viewPort.height/2 ;
-		console.log("animatedElementTrackedMove. from x: "+x+", y:"+y+", viewPortCenterX: "+viewPortCenterY+", yOffset: "+yOffset);
+		//console.log("animatedElementTrackedMove. from x: "+x+", y:"+y+", viewPortCenterX: "+viewPortCenterY+", yOffset: "+yOffset);
 		if((xOffset > 0 && (x+xOffset) > viewPortCenterX  && (x+xOffset) <= (maxWidth-viewPortCenterX))
 			|| (xOffset < 0 && (x+xOffset) >= viewPortCenterX  && (x+xOffset) < (maxWidth-viewPortCenterX)) 
 			|| (yOffset > 0 && (y+yOffset) > viewPortCenterY && (y+yOffset) <= (maxHeight-viewPortCenterY))
