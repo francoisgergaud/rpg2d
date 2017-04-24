@@ -55,7 +55,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		);
 		//and add the missing right part
 		var gridColumnIndex = this.backgroundViewPort.x+this.backgroundViewPort.width -1;
-		for(j=0; j< this._environment.grid[gridColumnIndex].length; j++){
+		console.log("fetch grid-column: "+gridColumnIndex);
+		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y); j++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -64,7 +65,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 				this._environment.spriteSize,
 				this._environment.spriteSize, 
 				(this.backgroundViewPort.width - 1) * this._environment.spriteSize, 
-				j * this._environment.spriteSize, 
+				(j-this.backgroundViewPort.y) * this._environment.spriteSize, 
 				this._environment.spriteSize,
 				this._environment.spriteSize
 			);
@@ -85,7 +86,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		);
 		//and add the missing right part
 		var gridColumnIndex = this.backgroundViewPort.x-1;
-		for(j=0; j< this._environment.grid[gridColumnIndex].length; j++){
+		console.log("fetch grid-column: "+gridColumnIndex);
+		for(j=this.backgroundViewPort.y; j< (this.backgroundViewPort.height+this.backgroundViewPort.y); j++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -94,7 +96,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 				this._environment.spriteSize,
 				this._environment.spriteSize, 
 				0,
-				j * this._environment.spriteSize, 
+				(j-this.backgroundViewPort.y) * this._environment.spriteSize, 
 				this._environment.spriteSize,
 				this._environment.spriteSize
 			);
@@ -115,7 +117,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		);
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y+this.backgroundViewPort.height -1;
-		for(i=0; i< this._environment.grid.length; i++){
+		console.log("fetch grid-line: "+gridLineIndex);
+		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x); i++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -123,7 +126,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].y*this._environment.spriteSize,
 				this._environment.spriteSize,
 				this._environment.spriteSize, 
-				i * this._environment.spriteSize, 
+				(i-this.backgroundViewPort.x) * this._environment.spriteSize, 
 				(this.backgroundViewPort.height - 1) * this._environment.spriteSize, 
 				this._environment.spriteSize,
 				this._environment.spriteSize
@@ -145,7 +148,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		);
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y-1;
-		for(i=0; i< this._environment.grid.length; i++){
+		console.log("fetch grid-line: "+gridLineIndex);
+		for(i=this.backgroundViewPort.x; i< (this.backgroundViewPort.width+this.backgroundViewPort.x); i++){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
@@ -153,7 +157,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].y*this._environment.spriteSize,
 				this._environment.spriteSize,
 				this._environment.spriteSize, 
-				i * this._environment.spriteSize, 
+				(i-this.backgroundViewPort.x)  * this._environment.spriteSize, 
 				0, 
 				this._environment.spriteSize,
 				this._environment.spriteSize

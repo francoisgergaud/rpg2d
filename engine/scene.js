@@ -53,6 +53,7 @@ function registerEventForPlayableCharacter(character){
 	window.addEventListener(
 		'keydown',
 		function(e){
+			character.stop();
 			switch(e.keyCode){
 				case 40:
 					//down
