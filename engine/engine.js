@@ -28,7 +28,10 @@ function Engine (scene, displayCanvas, camera, animationInterval){
 	this.mainLoop = function(){
 		//update tha animated elements
 		this._scene.getPlayableCharacter().animate();
-		 window.requestAnimationFrame(this._render.bind(this));
+		this._scene.getAnimatedElements().forEach(function(animatedElement){
+			animatedElement.animate();
+		});
+		window.requestAnimationFrame(this._render.bind(this));
 	};
 
 	/**
@@ -40,7 +43,11 @@ function Engine (scene, displayCanvas, camera, animationInterval){
 		this._backgroundBuffer.render(this._camera.getViewPort(), this._displayCanvas);
 		//render the animated elements
 		this._scene.getPlayableCharacter().render(this._camera.getViewPort(), this._displayCanvas);
-	}
+		this._scene.getAnimatedElements().forEach(
+			function(animatedElement){
+			animatedElement.render(this._camera.getViewPort(), this._displayCanvas);
+		}.bind(this));
+	};
 
 	/**
 	 * start the engine. It basically start a loop which animate and render the elements
@@ -48,7 +55,7 @@ function Engine (scene, displayCanvas, camera, animationInterval){
 	 */
 	this.start = function(){
 		this.animationTimer = window.setInterval(this.mainLoop.bind(this), this._animationInterval);
-	}
+	};
 
 	/**
 	 * getter for the display-canvas

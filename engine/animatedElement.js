@@ -9,7 +9,9 @@ function AnimatedElement() {
 	 * the listeners to be executed when animate method is executed
 	 * @type {Array}
 	 */
-	this._animateListeners = [];
+	//TODO: review the protoype inheritance. The same prototype object is used if not overriden in the child
+	//classes... it works more like a static element...
+	//this._animateListeners = [];
 
 	/**
 	 * register the scene for this animated_element to be able to interact with other elements. This method is 

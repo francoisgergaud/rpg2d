@@ -1,10 +1,11 @@
 /**
  * a playable character. The view-port will be centered on it
+ * @param id {string} character´s identifier
  * @param spritesFilename {String} the filename containing the sprties (PNG file)
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param sspriteSize {Integer} the sprite-size (only sprite with square shape are managed)
  */
-function Character(spritesFilename, animationData, spriteSize){
+function Character(id, spritesFilename, animationData, spriteSize){
 	this._animationData = animationData;
 	this._spriteCanvas = null;
 	this._spriteSize = spriteSize;
@@ -19,6 +20,13 @@ function Character(spritesFilename, animationData, spriteSize){
 		moving: false
 	};
 	this._spriteLoading = false;
+	this._id = id;
+
+	/**
+	 * the listeners to be executed when animate method is executed
+	 * @type {Array}
+	 */
+	this._animateListeners = [];
 
 	/**
 	 * initialization method. Is called after the basic-properties initialization
@@ -47,7 +55,7 @@ function Character(spritesFilename, animationData, spriteSize){
 
 	/**
 	 * cmove an animated element into a direction
-	 * @param  {integer} direction an integer representing the direction. 0: up, 1: right, 2: down, 3: left 
+	 * @param  {integer} direction an integer representing the direction. 0: down, 1: right, 2: up, 3: left 
 	 * @return {[None} 
 	 */
 	this.move = function(direction){
@@ -68,6 +76,7 @@ function Character(spritesFilename, animationData, spriteSize){
 	 * @return {None}
 	 */
 	this.animate = function(){
+		this.processEvents();
 		if(this._currentState.moving){
 			var sprites = null;
 			var xOffset = 0;
@@ -116,6 +125,14 @@ function Character(spritesFilename, animationData, spriteSize){
 			);
 		}
 	};
+
+	/**
+	 * process the events and change the character state. Executed at the beginning of each animate call
+	 * @return {None}
+	 */
+	this.processEvents = function(){
+
+	}
 
 	this._initialize();
 }

@@ -1,17 +1,26 @@
 /**
  * the scene: contains the animated elements and the background
  */
-function Scene(playableCharacter, environment) {
+function Scene(playableCharacter, animatedElements, environment) {
 
 	this._playableCharacter = playableCharacter;
+	this._animatedElements = animatedElements;
 	this._environment = environment;
-
+	
 	/**
 	 * return the scene´s playable character
 	 * @type {Character}
 	 */
 	this.getPlayableCharacter = function(){
 		return this._playableCharacter;
+	};
+
+	/**
+	 * return the scene´s animated-elements
+	 * @type {array}
+	 */
+	this.getAnimatedElements = function(){
+		return this._animatedElements;
 	};
 
 	/**
@@ -34,12 +43,25 @@ function SceneFactory() {
 			jsonData.environment.spriteSize
 		);
 		var playableCharacter = new Character(
+			"playableCharacter",
 			jsonData.playableCharacter.spriteFilename, 
 			jsonData.playableCharacter.animationData,
 			jsonData.playableCharacter.spriteSize
 		);
 		registerEventForPlayableCharacter(playableCharacter);
-		return new Scene(playableCharacter, environment);
+		var animatedElements = [];
+		jsonData.animatedElements.forEach(function(animatedElementDefinition){
+			var animatedElement = new Character(
+				(Math.random() * 10),
+				animatedElementDefinition.spriteFilename, 
+				animatedElementDefinition.animationData,
+				animatedElementDefinition.spriteSize
+			);
+			animatedElement.processEvents = animatedElementDefinition.processEvents;
+			animatedElements.push(animatedElement);
+		});
+
+		return new Scene(playableCharacter, animatedElements, environment);
 	}
 	return this;
 }
