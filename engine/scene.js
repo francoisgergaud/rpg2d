@@ -34,9 +34,10 @@ function Scene(playableCharacter, animatedElements, environment) {
 
 /**
  * TODO: is it really the right way to create and invoke a static method?
+ * @param {boolean} online is the scene online
  */
-function SceneFactory() {
-	this.loadFromJson = function(jsonData){
+function SceneFactory(online) {
+	this.loadFromJson = function(jsonData, online){
 		var environment = new Environment(
 			jsonData.environment.spriteFilename, 
 			jsonData.environment.backgroundSpriteData, 
@@ -44,21 +45,24 @@ function SceneFactory() {
 		);
 		var playableCharacter = new Character(
 			"playableCharacter",
+			online,
 			jsonData.playableCharacter.spriteFilename, 
 			jsonData.playableCharacter.animationData,
 			jsonData.playableCharacter.spriteSize
 		);
-		registerEventForPlayableCharacter(playableCharacter);
-		var animatedElements = [];
+		registerEventForPlayableCharacter(playableCharacter, online);
+		var animatedElements = {};
 		jsonData.animatedElements.forEach(function(animatedElementDefinition){
+			var animatedElementId = (Math.random() * 10);
 			var animatedElement = new Character(
-				(Math.random() * 10),
+				animatedElementId,
+				false,
 				animatedElementDefinition.spriteFilename, 
 				animatedElementDefinition.animationData,
 				animatedElementDefinition.spriteSize
 			);
 			animatedElement.processEvents = animatedElementDefinition.processEvents;
-			animatedElements.push(animatedElement);
+			animatedElements[animatedElementId] = animatedElement;
 		});
 
 		return new Scene(playableCharacter, animatedElements, environment);
@@ -69,31 +73,34 @@ function SceneFactory() {
 /**
  * map the keyboard arrows with the playable character actions
  * @param  {Character} character to set a playable
+ * @param { boolean} online determine if the user's actions must be sent to the server or not
  * @return {None}
  */
-function registerEventForPlayableCharacter(character){
+function registerEventForPlayableCharacter(character,online){
 	window.addEventListener(
 		'keydown',
 		function(e){
-			character.stop();
+			//character.stop();
+			var direction = null;
 			switch(e.keyCode){
 				case 40:
 					//down
-					character.move(0); 
+					direction = 0; 
 					break;
 				case 39: 
 					//right
-					character.move(1);
+					direction = 1;
 					break;
 				case 38:
 					//up
-					character.move(2); 
+					direction = 2; 
 					break;
 				case 37: 
 					//left
-					character.move(3); 
+					direction = 3; 
 					break;
 			}
+			character.move(direction);
 		}
 	);
 	window.addEventListener(

@@ -13,10 +13,11 @@ function game(canvas){
 	//setup the view-port and its display canvas
 	var viewPortWidth = 40;
 	var viewPortHeight = 30;
+	var online = true;
 	canvas.width = gridBlockSize*viewPortWidth;
 	canvas.height = gridBlockSize*viewPortHeight;
-	var scene = SceneFactory().loadFromJson(scene1);
+	var scene = SceneFactory(online).loadFromJson(scene2, online);
 	var camera = new Camera({x:0,y:0,width: canvas.width, height: canvas.height}, scene);
-	var engine = new Engine(scene, canvas, camera, animationPeriod);
-	engine.start();
+	var engine = new Engine(scene, canvas, camera, animationPeriod, online);
+	//engine.start(); //now the start call is included in the engine constructor
 }

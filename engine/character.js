@@ -1,11 +1,15 @@
 /**
+ * TODO: inherit a playable character from this class. only the playable character can be online
  * a playable character. The view-port will be centered on it
  * @param id {string} character´s identifier
+ * @param {boolean} online is it a playable character online
  * @param spritesFilename {String} the filename containing the sprties (PNG file)
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param sspriteSize {Integer} the sprite-size (only sprite with square shape are managed)
  */
-function Character(id, spritesFilename, animationData, spriteSize){
+function Character(id, online, spritesFilename, animationData, spriteSize){
+	this._id = id;
+	this._online = online;
 	this._animationData = animationData;
 	this._spriteCanvas = null;
 	this._spriteSize = spriteSize;
@@ -20,8 +24,7 @@ function Character(id, spritesFilename, animationData, spriteSize){
 		moving: false
 	};
 	this._spriteLoading = false;
-	this._id = id;
-
+	
 	/**
 	 * the listeners to be executed when animate method is executed
 	 * @type {Array}
@@ -61,6 +64,22 @@ function Character(id, spritesFilename, animationData, spriteSize){
 	this.move = function(direction){
 		this._currentState.direction=direction;
 		this._currentState.moving = true;
+		if(online){
+			$.ajax({
+				context: this,
+				url: 'http://localhost:8080/movePlayer',
+				data: JSON.stringify({id: this._id, currentState: this._currentState}),
+				method: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				dataType : 'text',
+				error: function(data) {
+				  console.log("error while moving player: " + data);
+				},
+				success: function(data) {
+					console.log("player move sent successfully");
+				}
+			});
+		}
 	};
 
 	/**
@@ -69,6 +88,22 @@ function Character(id, spritesFilename, animationData, spriteSize){
 	 */
 	this.stop = function(){
 		this._currentState.moving = false;
+		if(online){
+			$.ajax({
+				context: this,
+				url: 'http://localhost:8080/movePlayer',
+				data: JSON.stringify({id: this._id, currentState: this._currentState}),
+				method: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				dataType : 'text',
+				error: function(data) {
+				  console.log("error while moving player: " + data);
+				},
+				success: function(data) {
+					console.log("player move sent successfully");
+				}
+			});
+		}
 	};
 
 	/**
