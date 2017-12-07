@@ -16,7 +16,6 @@ function SceneFactory(online) {
 			jsonData.playableCharacter.animationData,
 			jsonData.playableCharacter.spriteSize
 		);
-		registerEventForPlayableCharacter(playableCharacter, online);
 		var animatedElements = {};
 		jsonData.animatedElements.forEach(function(animatedElementDefinition){
 			var animatedElementId = (Math.random() * 10);
@@ -31,7 +30,6 @@ function SceneFactory(online) {
 			animatedElements[animatedElementId] = animatedElement;
 		});
 		var scene =  new Scene(playableCharacter, animatedElements, environment);
-		scene.getPlayableCharacter()._registerScene(this._scene);
 		return scene;
 	};
 
@@ -86,7 +84,6 @@ function SceneFactory(online) {
 					},
 				this);
 				scene._animatedElements = animatedElements;
-				scene.getPlayableCharacter()._registerScene(scene);
 				scene.listenToServer(serverBaseURL, this);
 			    callback();
 			}

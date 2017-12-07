@@ -58,10 +58,6 @@ function Engine (displayCanvas, animationInterval, online){
 				this._scene.getAnimatedElements()[id].render(this._camera.getViewPort(), this._displayCanvas);
 			}, 
 			this);
-		/*this._scene.getAnimatedElements().forEach(
-			function(animatedElement){
-			animatedElement.render(this._camera.getViewPort(), this._displayCanvas);
-		}.bind(this));*/
 	};
 
 	/**

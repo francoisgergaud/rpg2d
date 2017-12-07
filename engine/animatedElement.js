@@ -21,8 +21,6 @@ function AnimatedElement(id, spritesFilename, animationData, spriteSize) {
 		velocity: 5,
 		moving: false
 	};
-	/** @type {scene} the scene the animated-element is part of */
-	this._scene = null;
 
 	this._spriteLoading = false;
 	
@@ -112,23 +110,6 @@ function AnimatedElement(id, spritesFilename, animationData, spriteSize) {
 				this._spriteSize
 			);
 		}
-	};
-
-	/**
-	 * register the scene for this animated_element to be able to interact with other elements. This method is 
-	 * called by the engine when processing/initializing the scene
-	 * @param  scene {Scene} the scene to register
-	 * @return {None}
-	 */
-	this._registerScene = function(scene){
-		this._scene = scene;
-	};
-
-	/**
-	 * @return {Scene} the scene used for this animated element
-	 */
-	this.getScene = function(){
-		return this._scene;
 	};
 
 	/**
