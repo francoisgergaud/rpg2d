@@ -5,11 +5,12 @@
  * @param {boolean} online is it a playable character online
  * @param spritesFilename {String} the filename containing the sprties (PNG file)
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
- * @param sspriteSize {Integer} the sprite-size (only sprite with square shape are managed)
+ * @param spriteWidth {Integer} the sprite's width
+ * @param spriteHeight {Integer} the sprite's height
  */
-function Character(id, online, spritesFilename, animationData, spriteSize){
+function Character(id, online, spritesFilename, animationData, spriteWidth, spriteHeight){
 
-	AnimatedElement.call(this, id, spritesFilename, animationData, spriteSize);
+	AnimatedElement.call(this, id, spritesFilename, animationData, spriteWidth, spriteHeight);
 	this._online = online;
 	
 	/**

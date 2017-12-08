@@ -1,16 +1,18 @@
 /**
- * an animated element. IT will be used as a based class to contain common fucntionalities shared between animated elements
+ * an animated element. It will be used as a based class to contain common fucntionalities shared between animated elements
  * @param id {string} character´s identifier
  * @param spritesFilename {String} the filename containing the sprties (PNG file)
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
- * @param spriteSize {Integer} the sprite-size (only sprite with square shape are managed)
+ * @param spriteWidth {Integer} the sprite's width in pixel
+ * @param spriteHeight {Integer} the sprite's height in pixel
  */
-function AnimatedElement(id, spritesFilename, animationData, spriteSize) {
+function AnimatedElement(id, spritesFilename, animationData, spriteWidth, spriteHeight) {
 
 	this._id = id;
 	this._animationData = animationData;
 	this._spriteCanvas = null;
-	this._spriteSize = spriteSize;
+	this._spriteWidth = spriteWidth;
+	this._spriteHeight = spriteHeight;
 	this._currentState = {
 		position: {
 			x:0,
@@ -51,6 +53,8 @@ function AnimatedElement(id, spritesFilename, animationData, spriteSize) {
 		var _spriteCanvasContext = this._spriteCanvas.getContext('2d');
 		var drawing = new Image();
 		drawing.onload = function() {
+			this._spriteCanvas.width = drawing.width;
+			this._spriteCanvas.height = drawing.height;
 	   		_spriteCanvasContext.drawImage(drawing,0,0);
 	   		this._spriteLoading = false;
 		}.bind(this);
@@ -100,14 +104,14 @@ function AnimatedElement(id, spritesFilename, animationData, spriteSize) {
 			var spriteCoordinate = this._animationData[this._currentState.direction][this._currentState.frame];
 			displayCanvas.getContext('2d').drawImage(
 				this._spriteCanvas,
-				spriteCoordinate.x*this._spriteSize, 
-				spriteCoordinate.y*this._spriteSize,
-				this._spriteSize,
-				this._spriteSize, 
+				spriteCoordinate.x*this._spriteWidth, 
+				spriteCoordinate.y*this._spriteHeight,
+				this._spriteWidth,
+				this._spriteHeight, 
 				(this._currentState.position.x)-viewPort.x, 
 				(this._currentState.position.y)-viewPort.y, 
-				this._spriteSize,
-				this._spriteSize
+				this._spriteWidth,
+				this._spriteHeight
 			);
 		}
 	};

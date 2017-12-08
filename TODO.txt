@@ -4,3 +4,4 @@
 - server: implement Map generation (see Perlin Noise algorithm). Also see infinite map, generation on demand (Minecraft like)
 - implement character apparence selection and name (player should be able to choose them before connecting to online mode)
 - check the solo mode: is it still working?
+- implement tests

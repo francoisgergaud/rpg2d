@@ -39,13 +39,15 @@ function SceneFactory(online) {
 	 */
 	this.loadFromServer = function(serverBaseURL, callback){
 		var scene = new OnlineScene();
+		var characterId = Math.floor(Math.random() * 8);
 		$.ajax({
 			context: this,
 			url: serverBaseURL+'/registerPlayer',
-			data: JSON.stringify({id: 'jean-michel'}),
+			data: JSON.stringify({id: 'jean-michel', characterId: characterId}),
 			method: 'POST',
 			contentType: 'application/json; charset=utf-8',
 			dataType : 'json',
+			characterId : characterId,
 			error: function() {
 			  console.log("error while registering player");
 			},
@@ -56,20 +58,15 @@ function SceneFactory(online) {
 				var environment = new Environment(spriteFilename, backgroundSpriteData, spriteSize);
 				environment.grid = data.map;
 				scene._environment = environment;
-				spriteFilename = "./data/resources/hetalia_sprites_by_carmenmcs.png";
-				spriteSize =  32;
-				animationData = [
-		   			[{x:6,y:0},{x:7,y:0},{x:8,y:0}],
-		   			[{x:6,y:2},{x:7,y:2},{x:8,y:2}],
-		   			[{x:6,y:3},{x:7,y:3},{x:8,y:3}],
-		   			[{x:6,y:1},{x:7,y:1},{x:8,y:1}]
-		   		];
+				//sprite-mapping is defined in the data/resources/sprite mapping
+				animationData = characterSpritesMapping[characterId];
 				var playableCharacter = new Character(
 					"playableCharacter",
 					true,
-					spriteFilename, 
+					characterSpritesFilename, 
 					animationData,
-					spriteSize
+					characterSpriteWidth,
+					characterSpriteHeight
 				);
 				scene._playableCharacter = playableCharacter;
 				playableCharacter._id = data.playerId;
@@ -100,14 +97,10 @@ function SceneFactory(online) {
 		var animatedElementId = animatedElementData.id;
         var character = new AnimatedElement(
         	animatedElementId,
-        	"./data/resources/hetalia_sprites_by_carmenmcs.png",
-			[
-	   			[{x:3,y:0},{x:4,y:0},{x:5,y:0}],
-	   			[{x:3,y:2},{x:4,y:2},{x:5,y:2}],
-	   			[{x:3,y:3},{x:4,y:3},{x:5,y:3}],
-	   			[{x:3,y:1},{x:4,y:1},{x:5,y:1}]
-	   		],
-	   		32
+        	characterSpritesFilename,
+			characterSpritesMapping[animatedElementData.characterId],
+	   		characterSpriteWidth,
+	   		characterSpriteHeight
 	   	);
 	   	character._currentState = animatedElementData.currentState;
 	   	return character;
