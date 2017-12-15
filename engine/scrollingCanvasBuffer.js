@@ -10,13 +10,13 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	this._createBufferCanvas = function(displayCanvas){
 		this._bufferCanvas = document.createElement('canvas');
 		//this._bufferCanvas.setAttribute("id", "_bufferCanvas");
-		this._bufferCanvas.width = displayCanvas.width+this._environment.spriteSize;
-		this._bufferCanvas.height = displayCanvas.height+this._environment.spriteSize;
+		this._bufferCanvas.width = displayCanvas.width+this._environment.tileSize;
+		this._bufferCanvas.height = displayCanvas.height+this._environment.tileSize;
 		this.backgroundViewPort={
 			x: 0,
 			y: 0,
-			width: (parseInt(displayCanvas.width/this._environment.spriteSize))+1,
-			height: (parseInt(displayCanvas.height/this._environment.spriteSize))+1,
+			width: (parseInt(displayCanvas.width/this._environment.tileSize))+1,
+			height: (parseInt(displayCanvas.height/this._environment.tileSize))+1,
 		};
 	};
 
@@ -29,14 +29,14 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			for(j= 0; j < this.backgroundViewPort.height; j++){
 				this._bufferCanvas.getContext('2d').drawImage(
 					this._environment.spriteCanvas,
-					this._environment.spritesData[this._environment.grid[i][j].spriteId].x*this._environment.spriteSize, 
-					this._environment.spritesData[this._environment.grid[i][j].spriteId].y*this._environment.spriteSize,
-					this._environment.spriteSize,
-					this._environment.spriteSize, 
-					i * this._environment.spriteSize, 
-					j * this._environment.spriteSize, 
-					this._environment.spriteSize,
-					this._environment.spriteSize
+					this._environment.tilesData[this._environment.grid[i][j].tileId].x*this._environment.tileSize, 
+					this._environment.tilesData[this._environment.grid[i][j].tileId].y*this._environment.tileSize,
+					this._environment.tileSize,
+					this._environment.tileSize, 
+					i * this._environment.tileSize, 
+					j * this._environment.tileSize, 
+					this._environment.tileSize,
+					this._environment.tileSize
 				);
 			}
 		}
@@ -50,7 +50,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//move background-canvas to left
 		this._bufferCanvas.getContext('2d').drawImage(
 			this._bufferCanvas,
-			0-this._environment.spriteSize,
+			0-this._environment.tileSize,
 			0
 		);
 		//and add the missing right part
@@ -60,14 +60,14 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
-				this._environment.spritesData[this._environment.grid[gridColumnIndex][j].spriteId].x*this._environment.spriteSize, 
-				this._environment.spritesData[this._environment.grid[gridColumnIndex][j].spriteId].y*this._environment.spriteSize,
-				this._environment.spriteSize,
-				this._environment.spriteSize, 
-				(this.backgroundViewPort.width - 1) * this._environment.spriteSize, 
-				(j-this.backgroundViewPort.y) * this._environment.spriteSize, 
-				this._environment.spriteSize,
-				this._environment.spriteSize
+				this._environment.tilesData[this._environment.grid[gridColumnIndex][j].tileId].x*this._environment.tileSize, 
+				this._environment.tilesData[this._environment.grid[gridColumnIndex][j].tileId].y*this._environment.tileSize,
+				this._environment.tileSize,
+				this._environment.tileSize, 
+				(this.backgroundViewPort.width - 1) * this._environment.tileSize, 
+				(j-this.backgroundViewPort.y) * this._environment.tileSize, 
+				this._environment.tileSize,
+				this._environment.tileSize
 			);
 		}
 		this.backgroundViewPort.x++;
@@ -81,7 +81,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		//move background-canvas to left
 		this._bufferCanvas.getContext('2d').drawImage(
 			this._bufferCanvas,
-			this._environment.spriteSize,
+			this._environment.tileSize,
 			0
 		);
 		//and add the missing right part
@@ -91,14 +91,14 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
-				this._environment.spritesData[this._environment.grid[gridColumnIndex][j].spriteId].x*this._environment.spriteSize, 
-				this._environment.spritesData[this._environment.grid[gridColumnIndex][j].spriteId].y*this._environment.spriteSize,
-				this._environment.spriteSize,
-				this._environment.spriteSize, 
+				this._environment.tilesData[this._environment.grid[gridColumnIndex][j].tileId].x*this._environment.tileSize, 
+				this._environment.tilesData[this._environment.grid[gridColumnIndex][j].tileId].y*this._environment.tileSize,
+				this._environment.tileSize,
+				this._environment.tileSize, 
 				0,
-				(j-this.backgroundViewPort.y) * this._environment.spriteSize, 
-				this._environment.spriteSize,
-				this._environment.spriteSize
+				(j-this.backgroundViewPort.y) * this._environment.tileSize, 
+				this._environment.tileSize,
+				this._environment.tileSize
 			);
 		}
 		this.backgroundViewPort.x--;
@@ -113,7 +113,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		this._bufferCanvas.getContext('2d').drawImage(
 			this._bufferCanvas,
 			0,
-			0-this._environment.spriteSize
+			0-this._environment.tileSize
 		);
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y+this.backgroundViewPort.height -1;
@@ -122,14 +122,14 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
-				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].x*this._environment.spriteSize, 
-				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].y*this._environment.spriteSize,
-				this._environment.spriteSize,
-				this._environment.spriteSize, 
-				(i-this.backgroundViewPort.x) * this._environment.spriteSize, 
-				(this.backgroundViewPort.height - 1) * this._environment.spriteSize, 
-				this._environment.spriteSize,
-				this._environment.spriteSize
+				this._environment.tilesData[this._environment.grid[i][gridLineIndex].tileId].x*this._environment.tileSize, 
+				this._environment.tilesData[this._environment.grid[i][gridLineIndex].tileId].y*this._environment.tileSize,
+				this._environment.tileSize,
+				this._environment.tileSize, 
+				(i-this.backgroundViewPort.x) * this._environment.tileSize, 
+				(this.backgroundViewPort.height - 1) * this._environment.tileSize, 
+				this._environment.tileSize,
+				this._environment.tileSize
 			);
 		}
 		this.backgroundViewPort.y++;
@@ -144,7 +144,7 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		this._bufferCanvas.getContext('2d').drawImage(
 			this._bufferCanvas,
 			0,
-			this._environment.spriteSize
+			this._environment.tileSize
 		);
 		//and add the missing right part
 		var gridLineIndex = this.backgroundViewPort.y-1;
@@ -153,14 +153,14 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 			//move background-canvas to left
 			this._bufferCanvas.getContext('2d').drawImage(
 				this._environment.spriteCanvas,
-				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].x*this._environment.spriteSize, 
-				this._environment.spritesData[this._environment.grid[i][gridLineIndex].spriteId].y*this._environment.spriteSize,
-				this._environment.spriteSize,
-				this._environment.spriteSize, 
-				(i-this.backgroundViewPort.x)  * this._environment.spriteSize, 
+				this._environment.tilesData[this._environment.grid[i][gridLineIndex].tileId].x*this._environment.tileSize, 
+				this._environment.tilesData[this._environment.grid[i][gridLineIndex].tileId].y*this._environment.tileSize,
+				this._environment.tileSize,
+				this._environment.tileSize, 
+				(i-this.backgroundViewPort.x)  * this._environment.tileSize, 
 				0, 
-				this._environment.spriteSize,
-				this._environment.spriteSize
+				this._environment.tileSize,
+				this._environment.tileSize
 			);
 		}
 		this.backgroundViewPort.y--;
@@ -175,8 +175,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		if(!this._environment.spriteLoading){
 			if(this._isBackgroungCanvasReady){
 				//refresh the background
-				var xOffset = viewPort.x-(this.backgroundViewPort.x*this._environment.spriteSize);
-				var yOffset = viewPort.y-(this.backgroundViewPort.y*this._environment.spriteSize);
+				var xOffset = viewPort.x-(this.backgroundViewPort.x*this._environment.tileSize);
+				var yOffset = viewPort.y-(this.backgroundViewPort.y*this._environment.tileSize);
 				displayCanvas.getContext('2d').drawImage(
 					this._bufferCanvas,
 					xOffset,
@@ -206,23 +206,24 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	 * @return {None}
 	 */
 	this.moveViewPort = function(viewPort, xOffset, yOffset){
-		var xSpriteDistance = parseInt((viewPort.x+xOffset)/this._environment.spriteSize) - parseInt(viewPort.x/this._environment.spriteSize);
+		var xSpriteDistance = parseInt((viewPort.x+xOffset)/this._environment.tileSize) - parseInt(viewPort.x/this._environment.tileSize);
 		if(xSpriteDistance == 1){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToRight();
 		}
-		if(this.backgroundViewPort.x > 0 && xSpriteDistance == -1){
+		else if(this.backgroundViewPort.x > 0 && xSpriteDistance == -1){
 			//move background-canvas to right
 			this.moveBackgroundCanvasToLeft();
-		}
-		var ySpriteDistance = parseInt((viewPort.y+yOffset)/this._environment.spriteSize) - parseInt(viewPort.y/this._environment.spriteSize);
-		if(ySpriteDistance == 1){
-			//move background-canvas to right
-			this.moveBackgroundCanvasToBottom();
-		}
-		if(this.backgroundViewPort.y > 0 && ySpriteDistance == -1){
-			//move background-canvas to right
-			this.moveBackgroundCanvasToTop();
+		}else{
+			var ySpriteDistance = parseInt((viewPort.y+yOffset)/this._environment.tileSize) - parseInt(viewPort.y/this._environment.tileSize);
+			if(ySpriteDistance == 1){
+				//move background-canvas to right
+				this.moveBackgroundCanvasToBottom();
+			}
+			else if(this.backgroundViewPort.y > 0 && ySpriteDistance == -1){
+				//move background-canvas to right
+				this.moveBackgroundCanvasToTop();
+			}
 		}
 	};
 

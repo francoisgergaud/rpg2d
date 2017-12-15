@@ -109,7 +109,7 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 				this._spriteWidth,
 				this._spriteHeight, 
 				(this._currentState.position.x)-viewPort.x, 
-				(this._currentState.position.y)-viewPort.y, 
+				(this._currentState.position.y)-viewPort.y - this._spriteHeight, 
 				this._spriteWidth,
 				this._spriteHeight
 			);

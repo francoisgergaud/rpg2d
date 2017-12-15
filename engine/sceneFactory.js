@@ -52,10 +52,7 @@ function SceneFactory(online) {
 			  console.log("error while registering player");
 			},
 			success: function(data){
-				var backgroundSpriteData = [{x:0,y:0},{x:1,y:0}];
-				var spriteFilename = "./data/resources/tileset4.png";
-				var spriteSize = 16;
-				var environment = new Environment(spriteFilename, backgroundSpriteData, spriteSize);
+				var environment = new Environment(backgroundTileFilename, backgroundTileData, tileSize, backgroundSpriteData, data.worldElements);
 				environment.grid = data.map;
 				scene._environment = environment;
 				//sprite-mapping is defined in the data/resources/sprite mapping

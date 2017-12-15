@@ -1,13 +1,17 @@
 /**
  * the environment: grid, sprite-canvas
  * @param {string} spritesFilename [description]
- * @param {array} spritesData coordinate mapping for the sprite-canvas in form of: 
+ * @param {array} tilesData coordinate mapping for the sprite-canvas in form of: 
  *                            [ {x: topPositionForSprite1, y: leftPositionForSprite1}, {x: topPositionForSprite2, y: leftPositionForSprite2}...]
- * @param {integer} spriteSize the sprite´s size in pixels (only square sprites are managed for now)
+ * @param {integer} tileSize the sprite´s size in pixels (only square sprites are managed for now)
+ * @param {object} spriteData the sprite-data (mapping coordinates in the spritesFilename and position of the center)
+ * @param {object} spritesInformation list of sprites to render
  */
-function Environment(spritesFilename, spritesData, spriteSize) {
-	this.spritesData = spritesData;
-	this.spriteSize = spriteSize;
+function Environment(spritesFilename, tilesData, tileSize, spriteData, spritesInformation) {
+	this.tilesData = tilesData;
+	this.tileSize = tileSize;
+	this.spriteData = spriteData;
+	this.sprites = [];
 	this.spriteCanvas = null;
 	this.grid = [];
 	this._spriteLoading = false;
@@ -17,7 +21,7 @@ function Environment(spritesFilename, spritesData, spriteSize) {
 	 */
 	this._initialize = function(){
 		this._createRandomGrid();
-		this._loadSprites(spritesFilename);
+		this._loadSprites(spritesFilename, spritesInformation);
 	};
 
 	/**
@@ -40,20 +44,36 @@ function Environment(spritesFilename, spritesData, spriteSize) {
 	/**
 	 * load the sprite-canvas from a file
 	 * @param  {string} filename  the file´s name from which the sprite-canvas will be initialized
+	 * @param {array of object} spritesInformation information about the sprite to be created
 	 * @return {None}
 	 */
-	this._loadSprites= function(filename){
+	this._loadSprites= function(filename, spritesInformation){
 		this.spriteCanvas = document.createElement('canvas');
 		var spriteCanvasContext = this.spriteCanvas.getContext('2d');
 		var drawing = new Image();
 		drawing.onload = function() {
+			this.spriteCanvas.width = drawing.width;
+			this.spriteCanvas.height = drawing.height;
 	   		spriteCanvasContext.drawImage(drawing,0,0);
 	   		//also initialized the background-canvas with the grid created and the sprites loaded
 	   		this._spriteLoading = false;
+	   		spritesInformation.forEach(
+	   			function(spriteInformation){
+	   				this.sprites.push(
+	   					new WorldElement(
+		   					spriteInformation.position, 
+		   					this.spriteCanvas, 
+		   					this.spriteData[spriteInformation.spriteId], 
+		   					this.tileSize
+		   				)
+	   				);
+	   			}.bind(this)
+	   		);
 		}.bind(this);
 		this._spriteLoading = true;
 		drawing.src = filename;
 	};
+
 
 	this._initialize();
 }

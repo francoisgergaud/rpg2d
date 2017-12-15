@@ -1,7 +1,10 @@
-- no square sprite (spriteWidth and spriteHeight instead of sprinteSize)
-- sprite overlay: manage depth (display sprite depending on their y position)
+DONE - no square sprite (spriteWidth and spriteHeight instead of sprinteSize)
+DONE - sprite overlay: manage depth (display sprite depending on their y position)
 - manage server client specific message: review the stomp protocol
-- server: implement Map generation (see Perlin Noise algorithm). Also see infinite map, generation on demand (Minecraft like)
+- server: implement Map generation (see Perlin Noise algorithm).
+- see infinite map, generation on demand (Minecraft like)
 - implement character apparence selection and name (player should be able to choose them before connecting to online mode)
 - check the solo mode: is it still working?
 - implement tests
+- do not load the sprite file several times for each character. pass the canvas instead of the sprite filename
+- implement colision detection

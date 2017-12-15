@@ -50,8 +50,8 @@ function Camera (viewPort, scene){
 	 * @return {None}
 	 */
 	this.animatedElementTrackedMove = function(x, y, xOffset, yOffset){
-		var maxWidth = Math.floor(this._scene.getEnvironment().grid.length*this._scene.getEnvironment().spriteSize);
-		var maxHeight = Math.floor(this._scene.getEnvironment().grid[0].length*this._scene.getEnvironment().spriteSize);
+		var maxWidth = Math.floor(this._scene.getEnvironment().grid.length*this._scene.getEnvironment().tileSize);
+		var maxHeight = Math.floor(this._scene.getEnvironment().grid[0].length*this._scene.getEnvironment().tileSize);
 		var viewPortCenterX = this._viewPort.width/2 ;
 		var viewPortCenterY = this._viewPort.height/2 ;
 		//console.log("animatedElementTrackedMove. from x: "+x+", y:"+y+", viewPortCenterX: "+viewPortCenterY+", yOffset: "+yOffset);

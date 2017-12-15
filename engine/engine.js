@@ -52,12 +52,41 @@ function Engine (displayCanvas, animationInterval, online){
 		//render the environment
 		this._backgroundBuffer.render(this._camera.getViewPort(), this._displayCanvas);
 		//render the animated elements
-		this._scene.getPlayableCharacter().render(this._camera.getViewPort(), this._displayCanvas);
+		//depth rendering
+		var elementsToRender = [];
+		elementsToRender.push(this._scene.getPlayableCharacter());
+		Object.keys(this._scene.getAnimatedElements()).forEach(
+			function(id, index) {
+				elementsToRender.push(this._scene.getAnimatedElements()[id]);
+			}, 
+		this);
+		this._scene.getEnvironment().sprites.forEach(
+			function(sprite) {
+				elementsToRender.push(sprite);
+			}, 
+		this);
+		elementsToRender.sort(
+			function(a, b){
+				return a._currentState.position.y - b._currentState.position.y;
+			}
+		);
+		elementsToRender.forEach(
+			function(elementToRender) {
+				elementToRender.render(this._camera.getViewPort(), this._displayCanvas);
+			}, 
+			this);
+		/*this._scene.getPlayableCharacter().render(this._camera.getViewPort(), this._displayCanvas);
 		Object.keys(this._scene.getAnimatedElements()).forEach(
 			function(id, index) {
 				this._scene.getAnimatedElements()[id].render(this._camera.getViewPort(), this._displayCanvas);
 			}, 
 			this);
+		//render the environment´s sprites
+		this._scene.getEnvironment().sprites.forEach(
+			function(sprite) {
+				sprite.render(this._camera.getViewPort(), this._displayCanvas);
+			}, 
+			this);*/
 	};
 
 	/**
