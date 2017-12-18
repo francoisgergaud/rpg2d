@@ -21,8 +21,9 @@ function WorldElement(position, spriteCanvas, spriteData, tileSize) {
 	this._spriteCanvas = spriteCanvas;
 	this._spriteData = spriteData;
 	this._tileSize = tileSize;
-	this._spriteLeft = this._currentState.position.x + (this._spriteData.startingPoint.x*this._tileSize);
-	this._spriteTop = this._currentState.position.y + (this._spriteData.startingPoint.y*this._tileSize);
+	// "- this._tileSize/2" is to center the sprite from the tile´s top-left corner
+	this._spriteLeft = this._currentState.position.x + (this._spriteData.startingPoint.x*this._tileSize);// - this._tileSize/2;
+	this._spriteTop = this._currentState.position.y + (this._spriteData.startingPoint.y*this._tileSize);// - this._tileSize/2;
 	this._spriteWidth = (this._spriteData.spriteDataPosition.width*this._tileSize);
 	this._spriteHeight = (this._spriteData.spriteDataPosition.height*this._tileSize);
 	this._spriteRight = this._spriteLeft + this._spriteWidth;
@@ -50,36 +51,4 @@ function WorldElement(position, spriteCanvas, spriteData, tileSize) {
 			);
 		}
 	};
-
-	/**
-	 * render a sprite
-	 * @param  {object} viewPort the camera position
-	 * @param  {object} sprite the sprite to render
-	 * @param {HTML canvas} displayCanvas the HTML canvas element
-	 * @return {None}
-	 */
-	/*this.renderSprite = function(viewPort, sprite, displayCanvas){
-		var spriteLeft = (sprite.position.x + spriteData.startingPoint.x)*this.tileSize;
-		var spriteTop = (sprite.position.y + spriteData.startingPoint.y)*this.tileSize;
-		var spriteWidth = (spriteData.spriteDataPosition.width*this.tileSize);
-		var spriteHeight = (spriteData.spriteDataPosition.height*this.tileSize);
-		var spriteRight = spriteLeft + spriteWidth;
-		var spriteBottom = spriteTop + spriteHeight;
-		//if(spriteRight < viewPort.x || spriteLeft > (viewPort.x+viewPort.width)
-		//	|| spriteBottom < viewPort.y ||  spriteTop > (viewPort.y+viewPort.height))
-		if(spriteRight > viewPort.x && spriteLeft < (viewPort.x+viewPort.width)
-			&& spriteBottom > viewPort.y && spriteTop < (viewPort.y+viewPort.height)){
-			displayCanvas.getContext('2d').drawImage(
-				this.spriteCanvas,
-				spriteData.spriteDataPosition.topLeft.x * this.tileSize, 
-				spriteData.spriteDataPosition.topLeft.y * this.tileSize,
-				spriteWidth,
-				spriteHeight, 
-				spriteLeft-viewPort.x, 
-				spriteTop-viewPort.y, 
-				spriteWidth,
-				spriteHeight
-			);
-		}
-	}*/
 }

@@ -7,4 +7,7 @@ DONE - sprite overlay: manage depth (display sprite depending on their y positio
 - check the solo mode: is it still working?
 - implement tests
 - do not load the sprite file several times for each character. pass the canvas instead of the sprite filename
-- implement colision detection
+DONE - implement colision detection
+- implement keep-alive
+- implement character initial position at specific coordinates
+- implement persist map on server

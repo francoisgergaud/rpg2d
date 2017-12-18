@@ -28,12 +28,17 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 	
 
 	/**
-	 * the listeners to be executed when animate method is executed
+	 * the listeners to be executed when animate method is executed. It will be called when new moving coordinate
+	 * will be calculated, but not set. Callback signature (currentX: <integer>, currentY: <integer>, offsetX: <integer>, offsetY: <integer>)
 	 * @type {Array}
 	 */
-	//TODO: review the protoype inheritance. The same prototype object is used if not overriden in the child
-	//classes... it works more like a static element...
-	this._animateListeners = [];
+	this._preAnimateListeners = [];
+
+	/**
+	 * the camera. If not null, the camera will track this element
+	 * @type {object}
+	 */
+	this._camera = null;
 
 	/**
 	 * initialization method. Is called after the basic-properties initialization
@@ -85,12 +90,17 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 					xOffset = 0 - this._currentState.velocity;
 					break;
 			}
-			for(var animateListener of this._animateListeners){
+			for(var animateListener of this._preAnimateListeners){
 				animateListener(this._currentState.position.x, this._currentState.position.y, xOffset, yOffset);
 			}
-			this._currentState.position.x +=xOffset;
-			this._currentState.position.y +=yOffset;
-			this._currentState.frame = (this._currentState.frame+1)%this._animationData[this._currentState.direction].length;	
+			if(this._currentState.moving){
+				if(this._camera != null){
+					this._camera.animatedElementTrackedMove(this._currentState.position.x, this._currentState.position.y, xOffset, yOffset);
+				}
+				this._currentState.position.x +=xOffset;
+				this._currentState.position.y +=yOffset;
+				this._currentState.frame = (this._currentState.frame+1)%this._animationData[this._currentState.direction].length;
+			}
 		}
 	};
 
@@ -117,11 +127,21 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 	};
 
 	/**
-	 * add a listener for the animate method
-	 * @param {object} listener listener to add to the list
+	 * set the camera tracker on this animated-element
+	 * @param {object} the camera
 	 */
-	this.addAnimateListener = function(listener){
-		this._animateListeners.push(listener);
+	this._setCamera = function(camera){
+		this._camera = camera;
+	}
+
+	/**
+	 * register a pre-animation listener. The callback will be executed before the animated-element is moved.
+	 * 
+	 * @param  {Function} callback the callback function to be called
+	 * @return {None}
+	 */
+	this.registerPreAnimateListener = function(callback){
+		this._preAnimateListeners.push(callback);
 	}
 
 	this._initialize();

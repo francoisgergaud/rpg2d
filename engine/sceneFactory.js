@@ -63,7 +63,8 @@ function SceneFactory(online) {
 					characterSpritesFilename, 
 					animationData,
 					characterSpriteWidth,
-					characterSpriteHeight
+					characterSpriteHeight,
+					scene
 				);
 				scene._playableCharacter = playableCharacter;
 				playableCharacter._id = data.playerId;

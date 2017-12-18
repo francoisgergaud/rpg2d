@@ -75,18 +75,6 @@ function Engine (displayCanvas, animationInterval, online){
 				elementToRender.render(this._camera.getViewPort(), this._displayCanvas);
 			}, 
 			this);
-		/*this._scene.getPlayableCharacter().render(this._camera.getViewPort(), this._displayCanvas);
-		Object.keys(this._scene.getAnimatedElements()).forEach(
-			function(id, index) {
-				this._scene.getAnimatedElements()[id].render(this._camera.getViewPort(), this._displayCanvas);
-			}, 
-			this);
-		//render the environment´s sprites
-		this._scene.getEnvironment().sprites.forEach(
-			function(sprite) {
-				sprite.render(this._camera.getViewPort(), this._displayCanvas);
-			}, 
-			this);*/
 	};
 
 	/**

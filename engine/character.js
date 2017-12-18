@@ -7,11 +7,13 @@
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param spriteWidth {Integer} the sprite's width
  * @param spriteHeight {Integer} the sprite's height
+ * @param scene {object} the scene the character is part-of
  */
-function Character(id, online, spritesFilename, animationData, spriteWidth, spriteHeight){
+function Character(id, online, spritesFilename, animationData, spriteWidth, spriteHeight, scene){
 
 	AnimatedElement.call(this, id, spritesFilename, animationData, spriteWidth, spriteHeight);
 	this._online = online;
+	this._scene = scene;
 	
 	/**
 	 * map the keyboard arrows with the playable character actions
@@ -50,6 +52,17 @@ function Character(id, online, spritesFilename, animationData, spriteWidth, spri
 				this.stop();
 			}.bind(this)
 		);
+		//add a istener for collision detection
+		this.registerPreAnimateListener(
+			function(x, y, xOffset, yOffset){
+				var environment = this._scene._environment;
+				var newXPosition = Math.floor((x+xOffset)/environment.tileSize);
+				var newYPosition = Math.floor((y+yOffset)/environment.tileSize);
+				if(environment.grid[newXPosition][newYPosition].spriteId  != null){
+					this.stop();
+				}
+			}.bind(this)
+		)
 	}
 
 	/**

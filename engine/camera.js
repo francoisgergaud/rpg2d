@@ -40,7 +40,7 @@ function Camera (viewPort, scene){
 	 * @return {None}
 	 */
 	this.track = function(animatedElement){
-		animatedElement.addAnimateListener(this.animatedElementTrackedMove.bind(this));
+		animatedElement._setCamera(this);
 	};
 
 	/**
