@@ -3,15 +3,15 @@
  * a playable character. The view-port will be centered on it
  * @param id {string} character´s identifier
  * @param {boolean} online is it a playable character online
- * @param spritesFilename {String} the filename containing the sprties (PNG file)
+ * @param spritesCanvas {HTML cancas} the canvas containing the sprties
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param spriteWidth {Integer} the sprite's width
  * @param spriteHeight {Integer} the sprite's height
  * @param scene {object} the scene the character is part-of
  */
-function Character(id, online, spritesFilename, animationData, spriteWidth, spriteHeight, scene){
+function Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene){
 
-	AnimatedElement.call(this, id, spritesFilename, animationData, spriteWidth, spriteHeight);
+	AnimatedElement.call(this, id, spritesCanvas, animationData, spriteWidth, spriteHeight);
 	this._online = online;
 	this._scene = scene;
 	

@@ -1,16 +1,26 @@
+/**
+ * the camera manage the view-port's moves. It can track an animated-elements to always center the view-port on it
+ * @param {Object} viewPort the voew-port
+ * @param {Scene} scene the scene the camera is attached to
+ */
 function Camera (viewPort, scene){
 
 	this._viewPort = viewPort;
 	this._listeners = [];
 	this._scene = scene;
 	
-
+	/**
+	 * register a listener. The listeners' moveViewPort(viewPort, xOffset, yOffset)' method is called 
+	 * everytime the view-port moves
+	 * @param {[type]} listener [description]
+	 */
 	this.addListener = function(listener){
 		this._listeners.push(listener);
 	}
 
 	/**
-	 * move the viewPort from (x,y) to (x+xOffset,y+yOffset) if it does not overboard the background canvas
+	 * move the viewPort from (x,y) to (x+xOffset,y+yOffset) if it does not overboard the background canvas.
+	 * It invokes the registered-listeners moveViewPort method
 	 * @param  {integer} x       x origin-position for the top-left corner
 	 * @param  {integer} y       y origin-position for the top-let corner
 	 * @param  {integer} xOffset distance in pixel to move the x-origin
@@ -65,5 +75,18 @@ function Camera (viewPort, scene){
 	};
 
 	this.track(scene.getPlayableCharacter());
+}
 
+/**
+ * The camera factory. USed for lazy constructing. Improve the testability
+ */
+function CameraFactory(){
+
+	/**
+	 * create a camera
+	 * @return {Camera} the camera created
+	 */
+	this.createCamera = function(viewPort, scene){
+		return new Camera(viewPort, scene);
+	}
 }

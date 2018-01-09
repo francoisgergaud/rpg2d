@@ -1,16 +1,16 @@
 /**
  * an animated element. It will be used as a based class to contain common fucntionalities shared between animated elements
  * @param id {string} character´s identifier
- * @param spritesFilename {String} the filename containing the sprties (PNG file)
+ * @param spritesCanvas {HTML canvas} the canvas containing the sprites (PNG file)
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param spriteWidth {Integer} the sprite's width in pixel
  * @param spriteHeight {Integer} the sprite's height in pixel
  */
-function AnimatedElement(id, spritesFilename, animationData, spriteWidth, spriteHeight) {
+function AnimatedElement(id, spritesCanvas, animationData, spriteWidth, spriteHeight) {
 
 	this._id = id;
 	this._animationData = animationData;
-	this._spriteCanvas = null;
+	this._spriteCanvas = spritesCanvas;
 	this._spriteWidth = spriteWidth;
 	this._spriteHeight = spriteHeight;
 	this._currentState = {
@@ -23,9 +23,6 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 		velocity: 5,
 		moving: false
 	};
-
-	this._spriteLoading = false;
-	
 
 	/**
 	 * the listeners to be executed when animate method is executed. It will be called when new moving coordinate
@@ -45,26 +42,6 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 	 * @return {[type]} [description]
 	 */
 	this._initialize = function(){
-		this._loadSprites(spritesFilename);
-	};
-
-	/**
-	 * load the sprtie-canvas from a file
-	 * @param  {string} filename file's name from which the sprite-canvas will be initialized
-	 * @return {None} 
-	 */
-	this._loadSprites= function(filename){
-		this._spriteCanvas = document.createElement('canvas');
-		var _spriteCanvasContext = this._spriteCanvas.getContext('2d');
-		var drawing = new Image();
-		drawing.onload = function() {
-			this._spriteCanvas.width = drawing.width;
-			this._spriteCanvas.height = drawing.height;
-	   		_spriteCanvasContext.drawImage(drawing,0,0);
-	   		this._spriteLoading = false;
-		}.bind(this);
-		this._spriteLoading = true;
-		drawing.src = filename;
 	};
 
 	/**
@@ -110,20 +87,18 @@ function AnimatedElement(id, spritesFilename, animationData, spriteWidth, sprite
 	 * @return {None}
 	 */
 	this.render = function(viewPort, displayCanvas){
-		if(!this._spriteLoading){
-			var spriteCoordinate = this._animationData[this._currentState.direction][this._currentState.frame];
-			displayCanvas.getContext('2d').drawImage(
-				this._spriteCanvas,
-				spriteCoordinate.x*this._spriteWidth, 
-				spriteCoordinate.y*this._spriteHeight,
-				this._spriteWidth,
-				this._spriteHeight, 
-				(this._currentState.position.x)-viewPort.x, 
-				(this._currentState.position.y)-viewPort.y - this._spriteHeight, 
-				this._spriteWidth,
-				this._spriteHeight
-			);
-		}
+		var spriteCoordinate = this._animationData[this._currentState.direction][this._currentState.frame];
+		displayCanvas.getContext('2d').drawImage(
+			this._spriteCanvas,
+			spriteCoordinate.x*this._spriteWidth, 
+			spriteCoordinate.y*this._spriteHeight,
+			this._spriteWidth,
+			this._spriteHeight, 
+			(this._currentState.position.x)-viewPort.x, 
+			(this._currentState.position.y)-viewPort.y - this._spriteHeight, 
+			this._spriteWidth,
+			this._spriteHeight
+		);
 	};
 
 	/**

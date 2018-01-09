@@ -1,32 +1,43 @@
-function scrollingCanvasBuffer(environment, displayCanvas, camera){
-	this._isBackgroungCanvasReady = false;
-	this._bufferCanvas = null;
+/**
+ * the environment's tiles canvas. Drawing the environment´s tiles is a costly operation (many 'drawImage' calls).
+ * Hence, to save these calls, the  environment's tiles are drawn once in a buffer canvas (hidden from the user) and
+ * the scene rendering 'drawImage' from this canvas to display to the display canvas (only one call to 'drawImage'
+ * is done). Make the rendering faster than drawing the environment's tiles one by one on each scene's rendering.
+ *
+ * Scrolling: when the scene's view-port (i.e.: camera) moves, this buffer canvas is updated if required only with 
+ * the missing part (may be the top, bottom, left or right part depending one the view-port move)
+ * @param  {Environment} environment the environment containing the tiles' sprites and the tiles
+ * @param  {Integer} originalCanvasWidth the original-canvas's width
+ * @param  {Integer} originalCanvasHeight the original-canvas's heigth
+ * @param  {Camera} camera the camera used by the scene
+ * @param  {HTMLCanvas} bufferCanavas [the canvas element used to buffer the environment's tiles
+ * @return {Promise} the promise resolves when the buffer-canvas is ready (all the environment's tileset have be drawn)
+ */
+function scrollingCanvasBuffer(environment, originalCanvasWidth, originalCanvasHeight, camera, bufferCanavas){
 	this._environment = environment;
+	this._bufferCanvas = bufferCanavas;
 
 	/**
 	 * create the buffer canvas for double-buffering purpose
 	 * @return {None}
 	 */
-	this._createBufferCanvas = function(displayCanvas){
-		this._bufferCanvas = document.createElement('canvas');
-		//this._bufferCanvas.setAttribute("id", "_bufferCanvas");
-		this._bufferCanvas.width = displayCanvas.width+this._environment.tileSize;
-		this._bufferCanvas.height = displayCanvas.height+this._environment.tileSize;
+	this._initialize = function(originalCanvasWidth, originalCanvasHeight, camera){
+		//resize of the HTML canvas. Size is the display-canvas + tile´s size (for the scrolling)
+		this._bufferCanvas.width = originalCanvasWidth+this._environment.tileSize;
+		this._bufferCanvas.height = originalCanvasHeight+this._environment.tileSize;
+		//create a view-port which store the buffer-canvas's current position. This view-port's coordinates
+		// change when scrolling
 		this.backgroundViewPort={
-			x: 0,
-			y: 0,
-			width: (parseInt(displayCanvas.width/this._environment.tileSize))+1,
-			height: (parseInt(displayCanvas.height/this._environment.tileSize))+1,
+			/*x: 0,
+			y: 0,*/
+			x: parseInt(camera._viewPort.x/this._environment.tileSize),
+			y: parseInt(camera._viewPort.y/this._environment.tileSize),
+			width: (parseInt(originalCanvasWidth/this._environment.tileSize))+1,
+			height: (parseInt(originalCanvasHeight/this._environment.tileSize))+1,
 		};
-	};
-
-	/**
-	 * move the background canvas to the right 
-	 * @return {[type]} [description]
-	 */
-	this.initializeBackgroundCanvas = function(){
-		for(i = 0; i < this.backgroundViewPort.width; i++){
-			for(j= 0; j < this.backgroundViewPort.height; j++){
+		//initial draw of each environment's tiles
+		for(i = this.backgroundViewPort.x; i < this.backgroundViewPort.width; i++){
+			for(j = this.backgroundViewPort.y; j < this.backgroundViewPort.height; j++){
 				this._bufferCanvas.getContext('2d').drawImage(
 					this._environment.spriteCanvas,
 					this._environment.tilesData[this._environment.grid[i][j].tileId].x*this._environment.tileSize, 
@@ -43,7 +54,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	};
 
 	/**
-	 * move the background canvas to the right 
+	 * move the background canvas to the right. It translate the cuurent buffer-canvas to the left and add the missing
+	 * tiles on the right
 	 * @return {[type]} [description]
 	 */
 	this.moveBackgroundCanvasToRight = function(){
@@ -74,7 +86,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	};
 
 	/**
-	 * move the background canvas to the left 
+	 * move the background canvas to the left. It translate the cuurent buffer-canvas to the right and add the missing
+	 * tiles on the left
 	 * @return {None}
 	 */
 	this.moveBackgroundCanvasToLeft = function(){
@@ -105,7 +118,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	};
 
 	/**
-	 * move the background canvas to the bottom 
+	 * move the background canvas to the bottom. It translate the cuurent buffer-canvas to the top and add the missing
+	 * tiles on the bottom
 	 * @return {None}
 	 */
 	this.moveBackgroundCanvasToBottom = function(){
@@ -136,7 +150,8 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	};
 
 	/**
-	 * move the background canvas to the top 
+	 * move the background canvas to the top. It translate the cuurent buffer-canvas to the bottom and add the missing
+	 * tiles on the top
 	 * @return {None}
 	 */
 	this.moveBackgroundCanvasToTop = function(){
@@ -172,30 +187,20 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 	 * @return {None}
 	 */
 	this.render = function(viewPort, displayCanvas){
-		if(!this._environment.spriteLoading){
-			if(this._isBackgroungCanvasReady){
-				//refresh the background
-				var xOffset = viewPort.x-(this.backgroundViewPort.x*this._environment.tileSize);
-				var yOffset = viewPort.y-(this.backgroundViewPort.y*this._environment.tileSize);
-				displayCanvas.getContext('2d').drawImage(
-					this._bufferCanvas,
-					xOffset,
-					yOffset,
-					viewPort.width,
-					viewPort.height,
-					0,
-					0,
-					viewPort.width,
-					viewPort.height
-				);
-			}else{
-				this.initializeBackgroundCanvas();
-				//document.body.appendChild(this._bufferCanvas);
-				this._isBackgroungCanvasReady = true;
-			}
-		}else{
-			this._isBackgroungCanvasReady = false;
-		}
+		//refresh the background
+		var xOffset = viewPort.x-(this.backgroundViewPort.x*this._environment.tileSize);
+		var yOffset = viewPort.y-(this.backgroundViewPort.y*this._environment.tileSize);
+		displayCanvas.getContext('2d').drawImage(
+			this._bufferCanvas,
+			xOffset,
+			yOffset,
+			viewPort.width,
+			viewPort.height,
+			0,
+			0,
+			viewPort.width,
+			viewPort.height
+		);
 	};
 
 	/**
@@ -227,6 +232,34 @@ function scrollingCanvasBuffer(environment, displayCanvas, camera){
 		}
 	};
 
-	this._createBufferCanvas(displayCanvas);
+	//add a listener to the camera so when it moves this canvasBuffer may scroll
 	camera.addListener(this);
+
+	//the promise
+	// var promise = new Promise(
+	// 	function(resolve, reject) {
+			this._initialize(originalCanvasWidth, originalCanvasHeight, camera);
+	// 		resolve(this);
+	// 	}.bind(this)
+	// );
+	// return promise;	
+}
+
+/**
+ * the scrolling-buffer factory. Use for lazy initializing and improve testability
+ */
+function ScrollingBufferFactory(){
+	
+	/**
+	 * create a scrolling-buffer
+	 * @param  {Environment} environment       the environment to scroll on
+	 * @param  {[Integer} originalCanvasWidth  the display-canvas' width
+	 * @param  {Integer} originalCanvasHeight  the display-canvas' height
+	 * @param  {Camera} camera                 the Camera (trigger the scrolling on move)
+	 * @return {scrollingCanvasBuffer}         the scrolling-buffer created
+	 */
+	this.createScrollingBuffer = function(environment, originalCanvasWidth, originalCanvasHeight, camera){
+		var hiddenCanvas = document.createElement('canvas');
+		return new scrollingCanvasBuffer(environment, originalCanvasWidth, originalCanvasHeight, camera, hiddenCanvas);	
+	}
 }

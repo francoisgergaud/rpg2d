@@ -1,28 +1,58 @@
 /**
  * the engine. contains the the main loop with process the events and render the scene
- * @param {Scene} _scene the scene (contains animated-elements, environment...)
  * @param {HTML canvas} _displayCanvas    the canvas where the scene will be rendered
- * @param {Camera} camera         the view-port (to manage camera moves)
+ * @param {HTML canvas} environmentCanvas       canvas containing the tiles and sprites for the environment
+ * @param {HTML canvas} characterCanvas       canvas containing the sprites for the character
  * @param {integer} animationInterval   the timer in milliseconds use to triger the scene´s animated elements update
- * @param {boolean} online :  use the multiplayer (client-server) mode 
+ * @param {boolean} online :  use the multiplayer (client-server) mode
+ * @param {integer} gridWidth the displayed-grid's width (number of grid element)
+ * @param {integer} gridHeight displayed-grid's height (number of grid element)
+ * @param {inetger} gridBlockSize size of a grid element
+ * @param {SceneFactory} sceneFactory the scene-factory
+ * @param {CameraFactory} cameraFactory the camera-factory
+ *  @param {ScrollingBufferFactory} scrollingBufferFactory the scrolling-buffer-factory
  */
-function Engine (displayCanvas, animationInterval, online){
+function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInterval, online, gridWidth, gridHeight, gridBlockSize, 
+	sceneFactory, cameraFactory, scrollingBufferFactory){
 	this._displayCanvas = displayCanvas;
 	this._animationInterval = animationInterval;
 	this._online = online
 	this._camera = null;
-	this._backgroundBuffer = null;	
+	this._backgroundBuffer = null;
 
 	/**
 	 * initialize the renderer after the basic-properties setup
 	 * @return {None}
 	 */
 	this._initialize = function(){
+		//resize the display canvas using the grid's size and the grid's individual-bloc size
+		var viewPortWidth = gridWidth*gridBlockSize;
+		var viewPortHeight = gridHeight*gridBlockSize;
+		displayCanvas.width = viewPortWidth;
+		displayCanvas.height = viewPortHeight;
+		//create the camera and its view-port
 		if(! this._online){
-			this._scene = SceneFactory().loadFromJson(scene2);
+			this._scene = sceneFactory.loadFromJson(scene2);
+			//create the camera and its view-port
+			this._camera = cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
+			//create the scrolling-buffer
+			this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene.getEnvironment(), this._displayCanvas.width, this._displayCanvas.height, this._camera);
+			// start the main-loop
 			this.start();
 		}else{
-			this._scene = SceneFactory().loadFromServer('http://localhost:8080', this.start.bind(this));
+			//chaining promises
+			//1 - load the scene from the server
+			sceneFactory.loadFromServer('http://localhost:8080', environmentCanvas, characterCanvas).then(
+				function(scene){
+					this._scene = scene
+					//create the camera and its view-port
+					this._camera = cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
+					//create the scrolling-buffer
+					this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene.getEnvironment(), this._displayCanvas.width, this._displayCanvas.height, this._camera);
+					// start the main-loop
+					this.start();
+				}.bind(this)
+			);
 		}
 	};
 
@@ -37,10 +67,8 @@ function Engine (displayCanvas, animationInterval, online){
 			function(id, index) {
 				this[id].animate();
 			}, 
-			this._scene.getAnimatedElements());
-		/*this._scene.getAnimatedElements().forEach(function(animatedElement){
-			animatedElement.animate();
-		});*/
+			this._scene.getAnimatedElements()
+		);
 		window.requestAnimationFrame(this._render.bind(this));
 	};
 
@@ -82,8 +110,6 @@ function Engine (displayCanvas, animationInterval, online){
 	 * @return {None}
 	 */
 	this.start = function(){
-		this._camera = new Camera({x:0,y:0,width: canvas.width, height: canvas.height}, this._scene);
-		this._backgroundBuffer = new scrollingCanvasBuffer(this._scene.getEnvironment(), this._displayCanvas, this._camera);
 		this.animationTimer = window.setInterval(this.mainLoop.bind(this), this._animationInterval);
 	};
 

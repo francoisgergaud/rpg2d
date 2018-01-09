@@ -11,3 +11,5 @@ DONE - implement colision detection
 - implement keep-alive
 - implement character initial position at specific coordinates
 - implement persist map on server
+- put the listener 'wiring' on a single code eas to read (scrollableCanvas wired to camera-tracking wired to playableCharacter etc...): find a way to have a clear object interdependencies description (improve DI?)
+- implement map/world reloading
