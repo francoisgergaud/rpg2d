@@ -13,3 +13,6 @@ DONE - implement colision detection
 - implement persist map on server
 - put the listener 'wiring' on a single code eas to read (scrollableCanvas wired to camera-tracking wired to playableCharacter etc...): find a way to have a clear object interdependencies description (improve DI?)
 - implement map/world reloading
+-remove global variables from Javascript
+- check why character disappear when miving from browser tab
+- move characterSpriteCanavas, characterSpriteHeigth, width... from SceneFactory to AnimatedElementFactory

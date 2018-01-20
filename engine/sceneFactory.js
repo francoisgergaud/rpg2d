@@ -43,12 +43,27 @@ function SceneFactory() {
 	 * @param {string} serverBaseURL  the server's base-URL
 	 * @param {HTML canvas} environmentCanvas       canvas containing the tiles and sprites for the environment
 	 * @param {HTML canvas} characterCanvas       canvas containing the sprites for the character
-	 * @param {function} successCallback function to be executed on success
+	 * @param {integer} characterId character-appearance identifier
+	 * @param {Object} backgroundTileData position-data mapping background-tiles on the environmentCanvas
+	 * @param {inetger} tileSize the tile-size (square tiles: the width=height=size)
+	 * @param {Object} backgroundSpriteData position-data mapping environment-sprites on the environmentCanvas
+	 * @param {EnvironmentFactory} environmentFactory the environment-factory
+	 * @param {Object} charactersSpritesMapping position-data mapping characters on the characterCanvas
+	 * @param {StompClientFactory} stompClientFactory the stomp-client factory
+	 * @return {Promise} the promise to be resolve for callback trigger
 	 */
-	this.loadFromServer = function(serverBaseURL, environmentCanvas, characterCanvas, callback){
+	this.loadFromServer = function(serverBaseURL, environmentCanvas, characterCanvas, characterId, backgroundTileData, tileSize, 
+		backgroundSpriteData, charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
+		animatedElementFactory, characterFactory, environmentFactory, stompClientFactory){
+		// store the characters meta-information to be able to create new one when onlineScene.registerNewPlayer is called
+		this._characterCanvas = characterCanvas;
+		this.charactersSpritesMapping = charactersSpritesMapping;
+		this.characterSpriteWidth = characterSpriteWidth;
+		this.characterSpriteHeight = characterSpriteHeight;
+		this.animatedElementFactory = animatedElementFactory;
+		//build the promise to be return. This promise resolves when response is received from server and processed correctly
 		var promise = new Promise(function(resolve, reject) {
 			var scene = new OnlineScene();
-			var characterId = Math.floor(Math.random() * 8);
 			$.ajax({
 				context: this,
 				url: serverBaseURL+'/registerPlayer',
@@ -58,38 +73,44 @@ function SceneFactory() {
 				dataType : 'json',
 				characterId : characterId,
 				error: function() {
-				  console.log("error while registering player");
+				  reject("error while registering player");
 				},
 				success: function(data){
-					var environment = new Environment(environmentCanvas, backgroundTileData, tileSize, backgroundSpriteData, data.worldElements);
-					environment.grid = data.map;
+					var environment = environmentFactory.createEnvironment(
+						environmentCanvas, 
+						backgroundTileData, 
+						tileSize, 
+						backgroundSpriteData, 
+						data.worldElements, 
+						data.map
+					);
 					scene._environment = environment;
 					//sprite-mapping is defined in the data/resources/sprite mapping
-					animationData = characterSpritesMapping[characterId];
-					var playableCharacter = new Character(
-						"playableCharacter",
-						true,
-						characterCanvas, 
-						animationData,
-						characterSpriteWidth,
-						characterSpriteHeight,
+					var playableCharacter = characterFactory.createCharacter(
+						data.playerId,
+						true, 
+						this._characterCanvas, 
+						this.charactersSpritesMapping[characterId], 
+						this.characterSpriteWidth, 
+						this.characterSpriteHeight, 
 						scene
 					);
 					scene._playableCharacter = playableCharacter;
-					playableCharacter._id = data.playerId;
 					var animatedElements = {};
 					Object.keys(data.animatedElements).forEach(
 						function(id, index) {
 							//the player is also part of the animated-elements returned. We must skip it
 							if(id != data.playerId){
-								var character = this.createAnimatedElementFromServerData(data.animatedElements[id],characterCanvas);
+								var character = this.createAnimatedElementFromServerData(data.animatedElements[id]);
 								animatedElements[character._id] = character;
 							}
 						},
 						this
 					);
 					scene._animatedElements = animatedElements;
-					scene.listenToServer(serverBaseURL, this);
+					//TODO: create- factory for STOMP client
+					stompClientFactory.createStompClient(serverBaseURL, scene, this);
+					//scene.listenToServer(serverBaseURL, this);
 				    resolve(scene);
 				}
 			});
@@ -100,17 +121,15 @@ function SceneFactory() {
 	/**
 	 * helper (stateless) function to create an animatedElement object from server´s character data
 	 * @param  {[object} animatedElementData the animated-element´s data
-	 * @param {HTML canvas} characterCanvas [the characters'sprite canvas
 	 * @return {AnimatedElement} the animated element creted from the data
 	 */
-	this.createAnimatedElementFromServerData = function(animatedElementData, characterCanvas){
-		var animatedElementId = animatedElementData.id;
-        var character = new AnimatedElement(
-        	animatedElementId,
-        	characterCanvas,
-			characterSpritesMapping[animatedElementData.characterId],
-	   		characterSpriteWidth,
-	   		characterSpriteHeight
+	this.createAnimatedElementFromServerData = function(animatedElementData){
+		var character = this.animatedElementFactory.createAnimatedElement(
+			animatedElementData.id,
+			this._characterCanvas, 
+			this.charactersSpritesMapping[animatedElementData.characterId],
+			this.characterSpriteWidth,
+	   		this.characterSpriteHeight
 	   	);
 	   	character._currentState = animatedElementData.currentState;
 	   	return character;

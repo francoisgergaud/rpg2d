@@ -121,3 +121,17 @@ function AnimatedElement(id, spritesCanvas, animationData, spriteWidth, spriteHe
 
 	this._initialize();
 }
+
+/**
+ * The animated-element factory. USed for lazy constructing. Improve the testability
+ */
+function AnimatedElementFactory(){
+
+	/**
+	 * create an animated-element
+	 * @return {AnimatedElement} the animated-element created
+	 */
+	this.createAnimatedElement = function(id, spritesCanvas, animationData, spriteWidth, spriteHeight){
+		return new AnimatedElement(id, spritesCanvas, animationData, spriteWidth, spriteHeight);
+	}
+}

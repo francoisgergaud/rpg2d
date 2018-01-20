@@ -121,3 +121,17 @@ function Character(id, online, spritesCanvas, animationData, spriteWidth, sprite
 
 //inherit the Character object from animatedElement object
 Character.prototype = new AnimatedElement();
+
+/**
+ * The character factory. USed for lazy constructing. Improve the testability
+ */
+function CharacterFactory(){
+
+	/**
+	 * create a character
+	 * @return {Character} the camera created
+	 */
+	this.createCharacter = function(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene){
+		return new Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene);
+	}
+}

@@ -10,10 +10,23 @@
  * @param {inetger} gridBlockSize size of a grid element
  * @param {SceneFactory} sceneFactory the scene-factory
  * @param {CameraFactory} cameraFactory the camera-factory
- *  @param {ScrollingBufferFactory} scrollingBufferFactory the scrolling-buffer-factory
+ * @param {ScrollingBufferFactory} scrollingBufferFactory the scrolling-buffer-factory
+ * @param {integer} characterId the character's appearance's identifier
+ * @param {Object} backgroundTileData position-data mapping background-tiles on the environmentCanvas
+ * @param {inetger} tileSize the tile-size (square tiles: the width=height=size)
+ * @param {Object} backgroundSpriteData position-data mapping environment-sprites on the environmentCanvas
+ * @param {Object} charactersSpritesMapping position-data mapping character-sprites on the characterCanvas
+ * @param {integer} characterSpriteWidth character sprite's width
+ * @param {integer} characterSpriteHeight character sprite's height
+ * @param {AnimatedElementFactory} charactersSpritesMapping the animated-element factory
+ * @param {CharacterFactory} characterFactory the character factory
+ * @param {EnvironmentFactory} environmentFactory the environment factory
+ * @param {StompClientFactory} stompClientFactory the stomp-client factory
  */
 function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInterval, online, gridWidth, gridHeight, gridBlockSize, 
-	sceneFactory, cameraFactory, scrollingBufferFactory){
+	sceneFactory, cameraFactory, scrollingBufferFactory, characterId, backgroundTilesData, tileSsize, backgroundSpritesData, 
+		charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
+		animatedElementFactory, characterFactory, environmentFactory, stompClientFactory){
 	this._displayCanvas = displayCanvas;
 	this._animationInterval = animationInterval;
 	this._online = online
@@ -42,13 +55,16 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 		}else{
 			//chaining promises
 			//1 - load the scene from the server
-			sceneFactory.loadFromServer('http://localhost:8080', environmentCanvas, characterCanvas).then(
+			sceneFactory.loadFromServer('http://localhost:8080', environmentCanvas, characterCanvas, characterId, backgroundTilesData, tileSsize, backgroundSpritesData, 
+				charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
+				animatedElementFactory, characterFactory, environmentFactory, stompClientFactory)
+			.then(
 				function(scene){
 					this._scene = scene
 					//create the camera and its view-port
 					this._camera = cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
 					//create the scrolling-buffer
-					this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene.getEnvironment(), this._displayCanvas.width, this._displayCanvas.height, this._camera);
+					this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene._environment, this._displayCanvas.width, this._displayCanvas.height, this._camera);
 					// start the main-loop
 					this.start();
 				}.bind(this)
@@ -62,12 +78,12 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 	 */
 	this.mainLoop = function(){
 		//update tha animated elements
-		this._scene.getPlayableCharacter().animate();
-		Object.keys(this._scene.getAnimatedElements()).forEach(
+		this._scene._playableCharacter.animate();
+		Object.keys(this._scene._animatedElements).forEach(
 			function(id, index) {
 				this[id].animate();
 			}, 
-			this._scene.getAnimatedElements()
+			this._scene._animatedElements
 		);
 		window.requestAnimationFrame(this._render.bind(this));
 	};
@@ -82,13 +98,13 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 		//render the animated elements
 		//depth rendering
 		var elementsToRender = [];
-		elementsToRender.push(this._scene.getPlayableCharacter());
-		Object.keys(this._scene.getAnimatedElements()).forEach(
+		elementsToRender.push(this._scene._playableCharacter);
+		Object.keys(this._scene._animatedElements).forEach(
 			function(id, index) {
-				elementsToRender.push(this._scene.getAnimatedElements()[id]);
+				elementsToRender.push(this._scene._animatedElements[id]);
 			}, 
 		this);
-		this._scene.getEnvironment().sprites.forEach(
+		this._scene._environment.sprites.forEach(
 			function(sprite) {
 				elementsToRender.push(sprite);
 			}, 
