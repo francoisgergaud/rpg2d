@@ -63,7 +63,7 @@ function SceneFactory() {
 		this.animatedElementFactory = animatedElementFactory;
 		//build the promise to be return. This promise resolves when response is received from server and processed correctly
 		var promise = new Promise(function(resolve, reject) {
-			var scene = new OnlineScene();
+			var scene = new OnlineScene(this);
 			$.ajax({
 				context: this,
 				url: serverBaseURL+'/registerPlayer',
@@ -109,7 +109,7 @@ function SceneFactory() {
 					);
 					scene._animatedElements = animatedElements;
 					//TODO: create- factory for STOMP client
-					stompClientFactory.createStompClient(serverBaseURL, scene, this);
+					stompClientFactory.createStompClient(serverBaseURL, scene);
 					//scene.listenToServer(serverBaseURL, this);
 				    resolve(scene);
 				}

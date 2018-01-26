@@ -1,55 +1,59 @@
-function OnlineScene(){
+/**
+ * online-scene: manage scene by listening a server using web-socket and STOMP client
+ * @param {SceneFactory} sceneFactory the scene factory used to build this scene (a reference is need to invoke the 
+ * createAnimatedElementFromServerData method from the scene-factory)
+ */
+function OnlineScene(sceneFactory){
 
+	/**
+	 * the scene-factory use to build this scene
+	 * TODO: a reference is need to invoke the createAnimatedElementFromServerData method from the scene-factory.
+	 * Not sure it is the right-place to be
+	 */
+	this._sceneFactory = sceneFactory;
+
+	//invoke the parent constructor
 	Scene.call(this, null, null, null);
-	
 
-	this.listenToServer = function(serverBaseURL, sceneFactory){
-		var socket = new SockJS(serverBaseURL+'/gameServer-websocket');
-		stompClient = Stomp.over(socket);
-	    stompClient.connect(
-	    	{}, 
-	    	function (frame) {
-		    	stompClient.subscribe(
-		    		'/topics/newPlayer', 
-		    		function (data) {
-		        		var parsedData = JSON.parse(data.body)
-		        		var character = sceneFactory.createAnimatedElementFromServerData(parsedData);
-				   		this._animatedElements[character._id] = character;
-		        	}.bind(this)
-		        );
-		        stompClient.subscribe(
-		        	'/topics/movePlayer', 
-		        	function (data) {
-		        		var parsedData = JSON.parse(data.body);
-		        		var animatedElement = this._animatedElements[parsedData.id];
-		        		//can be undefined if the animated-element is the current player
-		        		if(animatedElement != undefined){
-							animatedElement._currentState = parsedData.currentState;
-		        		}
-		        	}.bind(this)
-		        );
-		    }.bind(this)
-		);
+	/**
+	 * triggered when the server send a new-player event. Add the player to the list of animated-elements
+	 * @param  {Object} data JSON data sent by the server
+	 * @return {None}
+	 */
+	this.registerNewPlayer = function(data){
+		var character = this._sceneFactory.createAnimatedElementFromServerData(data);
+		this._animatedElements[character._id] = character;
 	};
 
-	this.subscribe = function(stompClient, sceneFactory){
+	/**
+	 * triggered when an animated-element is moved from the server
+	 * @param  {object} data information about the animated-elemnent and the movement information
+	 * @return {None}
+	 */
+	this.moveAnimatedElement = function(data){
+		var animatedElement = this._animatedElements[data.id];
+		//can be undefined if the animated-element is the current player
+		if(animatedElement != undefined){
+			animatedElement._currentState = data.currentState;
+		}
+	};
+
+	/**
+	 * subscribe to the server's topic and initialize the callback mapping
+	 * @param  {STOMP client} stompClient the client used to listen to the server
+	 * @return {None}
+	 */
+	this.subscribe = function(stompClient){
 		stompClient.subscribe(
     		'/topics/newPlayer', 
     		function (data) {
-        		var parsedData = JSON.parse(data.body)
-        		var character = sceneFactory.createAnimatedElementFromServerData(parsedData);
-		   		this._animatedElements[character._id] = character;
+        		this.registerNewPlayer(JSON.parse(data.body));
         	}.bind(this)
         );
         stompClient.subscribe(
-        	'/topics/movePlayer', 
-        	function (data) {
-        		var parsedData = JSON.parse(data.body);
-        		var animatedElement = this._animatedElements[parsedData.id];
-        		//can be undefined if the animated-element is the current player
-        		if(animatedElement != undefined){
-					animatedElement._currentState = parsedData.currentState;
-        		}
+    		'/topics/movePlayer', 
+    		function (data) {
+        		this.moveAnimatedElement(JSON.parse(data.body));
         	}.bind(this)
         );
 	}
@@ -69,13 +73,13 @@ function StompClientFactory(){
 	 * @param {SceneFactory} sceneFactory the scene factory
 	 * @return {STOMP client} the STOMP client created
 	 */
-	this.createStompClient = function(serverBaseURL, onlineScene, sceneFactory){
+	this.createStompClient = function(serverBaseURL, onlineScene){
 		var socket = new SockJS(serverBaseURL+'/gameServer-websocket');
 		stompClient = Stomp.over(socket);
 	    stompClient.connect(
 	    	{},
 	    	function () {
-		    	onlineScene.subscribe(stompClient, sceneFactory);
+		    	onlineScene.subscribe(stompClient);
 		    	console.log("stomp-client initialized correctly");
 		    }, 
 		    function(){
