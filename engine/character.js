@@ -8,8 +8,9 @@
  * @param spriteWidth {Integer} the sprite's width
  * @param spriteHeight {Integer} the sprite's height
  * @param scene {object} the scene the character is part-of
+ * @param $window {object} obect sending events
  */
-function Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene){
+function Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
 
 	AnimatedElement.call(this, id, spritesCanvas, animationData, spriteWidth, spriteHeight);
 	this._online = online;
@@ -20,7 +21,7 @@ function Character(id, online, spritesCanvas, animationData, spriteWidth, sprite
 	 * @return {None}
 	 */
 	this._initialize = function(){
-		window.addEventListener(
+		$window.addEventListener(
 			'keydown',
 			function(e){
 				//character.stop();
@@ -46,13 +47,13 @@ function Character(id, online, spritesCanvas, animationData, spriteWidth, sprite
 				this.move(direction);
 			}.bind(this)
 		);
-		window.addEventListener(
+		$window.addEventListener(
 			'keyup',
 			function(e){
 				this.stop();
 			}.bind(this)
 		);
-		//add a istener for collision detection
+		//add a listener for collision detection
 		this.registerPreAnimateListener(
 			function(x, y, xOffset, yOffset){
 				var environment = this._scene._environment;

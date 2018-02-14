@@ -19,7 +19,8 @@ function SceneFactory() {
 			false,
 			jsonData.playableCharacter.spriteFilename, 
 			jsonData.playableCharacter.animationData,
-			jsonData.playableCharacter.spriteSize
+			jsonData.playableCharacter.spriteSize,
+			window
 		);
 		var animatedElements = {};
 		jsonData.animatedElements.forEach(function(animatedElementDefinition){

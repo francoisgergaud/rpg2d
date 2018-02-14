@@ -16,3 +16,4 @@ DONE - implement colision detection
 -remove global variables from Javascript
 - check why character disappear when miving from browser tab
 - move characterSpriteCanavas, characterSpriteHeigth, width... from SceneFactory to AnimatedElementFactory
+- make the "window" DI
