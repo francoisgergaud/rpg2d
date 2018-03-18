@@ -118,7 +118,7 @@ describe("online-scene factory", function() {
     });
 
     it("should register 2 callbacks", function() {
-      expect(stompClient.subscribe).toHaveBeenCalledTimes(2);
+      expect(stompClient.subscribe).toHaveBeenCalledTimes(3);
     });
 
     describe("when receiving an event", function(){

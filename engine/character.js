@@ -74,22 +74,12 @@ function Character(id, online, spritesCanvas, animationData, spriteWidth, sprite
 	this.move = function(direction){
 		this._currentState.direction=direction;
 		this._currentState.moving = true;
-		if(this._online){
-			$.ajax({
-				context: this,
-				url: 'http://localhost:8080/movePlayer',
-				data: JSON.stringify({id: this._id, currentState: this._currentState}),
-				method: 'POST',
-				contentType: 'application/json; charset=utf-8',
-				dataType : 'text',
-				error: function(data) {
-				  console.log("error while moving player: " + data);
-				},
-				success: function(data) {
-					console.log("player move sent successfully");
-				}
-			});
-		}
+		var event = {
+			name: 'movePlayer',
+			data: {id: this._id, currentState: this._currentState}
+		};
+		this._scene.postEvent(event);
+		
 	};
 
 	/**
@@ -98,22 +88,12 @@ function Character(id, online, spritesCanvas, animationData, spriteWidth, sprite
 	 */
 	this.stop = function(){
 		this._currentState.moving = false;
-		if(this._online){
-			$.ajax({
-				context: this,
-				url: 'http://localhost:8080/movePlayer',
-				data: JSON.stringify({id: this._id, currentState: this._currentState}),
-				method: 'POST',
-				contentType: 'application/json; charset=utf-8',
-				dataType : 'text',
-				error: function(data) {
-				  console.log("error while moving player: " + data);
-				},
-				success: function(data) {
-					console.log("player move sent successfully");
-				}
-			});
-		}
+		//better use a generic listener build and set from the onlineScene (this way all accesses are in the onlineScene)
+		var event = {
+			name: 'movePlayer',
+			data: {id: this._id, currentState: this._currentState}
+		};
+		this._scene.postEvent(event);
 	};
 
 	this._initialize();
@@ -132,7 +112,7 @@ function CharacterFactory(){
 	 * create a character
 	 * @return {Character} the camera created
 	 */
-	this.createCharacter = function(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene){
-		return new Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene);
+	this.createCharacter = function(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
+		return new Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window);
 	}
 }

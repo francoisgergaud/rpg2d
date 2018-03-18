@@ -45,17 +45,44 @@ function OnlineScene(sceneFactory){
 	 */
 	this.subscribe = function(stompClient){
 		stompClient.subscribe(
-    		'/topics/newPlayer', 
+    		'/topic/newPlayer', 
     		function (data) {
         		this.registerNewPlayer(JSON.parse(data.body));
         	}.bind(this)
         );
         stompClient.subscribe(
-    		'/topics/movePlayer', 
+    		'/topic/movePlayer', 
     		function (data) {
         		this.moveAnimatedElement(JSON.parse(data.body));
         	}.bind(this)
         );
+        stompClient.subscribe(
+        	"/user/queue/movePlayer",
+        	function (data) {
+        		console.log(data);
+        	}.bind(this)
+        );
+        this._playableCharacter.stompClient=stompClient;
+	}
+
+	/**
+	 * called when an local-event occurs in the scene
+	 * @param  {Object} event the local event
+	 */
+	this.postEvent = function(event){
+		var url = null;
+		switch(event.name){
+			case 'movePlayer':  {
+				url="/app/movePlayer";
+				break;
+			}
+		}
+		if(url != null){
+			this.stompClient.send(url, {}, JSON.stringify(event.data));
+		}else{
+			console.log('Local-event could not be identified.');
+		}
+		
 	}
 }
 //inherit the OnlineScene object from Scene object
@@ -74,7 +101,7 @@ function StompClientFactory(){
 	 * @return {STOMP client} the STOMP client created
 	 */
 	this.createStompClient = function(serverBaseURL, onlineScene){
-		var socket = new SockJS(serverBaseURL+'/gameServer-websocket');
+		var socket = new SockJS(serverBaseURL+'/gameServer');
 		stompClient = Stomp.over(socket);
 	    stompClient.connect(
 	    	{},

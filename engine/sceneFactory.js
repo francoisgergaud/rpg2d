@@ -94,7 +94,8 @@ function SceneFactory() {
 						this.charactersSpritesMapping[characterId], 
 						this.characterSpriteWidth, 
 						this.characterSpriteHeight, 
-						scene
+						scene,
+						window
 					);
 					scene._playableCharacter = playableCharacter;
 					var animatedElements = {};
