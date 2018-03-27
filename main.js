@@ -9,7 +9,7 @@ var animationPeriod = 40;
  * @param  {Canvas} canvas the canvas DOM Element used for rendering
  * @return {None} 
  */
-function gameBootstrap(canvas){
+function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
 	var promises = [];
 	promises.push(getCanvasContextFromUrl(characterSpritesFilename));
 	promises.push(getCanvasContextFromUrl(backgroundTileFilename));
@@ -33,10 +33,45 @@ function gameBootstrap(canvas){
 			// define the playable-character's appareance randomly
 			var characterId = Math.floor(Math.random() * 8);
 			// create the game-engine
-			var engine = new Engine(canvas, environmentTilesCanvas, charactersSpritesCanvas, animationPeriod, online, viewPortWidth, viewPortHeight, 
+			var sceneConfiguration = {
+				gridWidth: viewPortWidth,
+				gridHeight: viewPortHeight,
+				online: online,
+				characterId: characterId,
+				animationPeriod: animationPeriod,
+				gridBlockSize: gridBlockSize
+			}
+			var factories ={
+				sceneFactory: sceneFactory,
+				cameraFactory: cameraFactory,
+				environmentFactory: environmentFactory,
+				scrollingBufferFactory: scrollingBufferFactory,
+				animatedElementFactory: animatedElementFactory,
+				characterFactory: characterFactory,
+				stompClientFactory: stompClientFactory
+			}
+			var resources = {
+				charactersCanvas: charactersSpritesCanvas,
+				environmentCanvas: environmentTilesCanvas,
+				backgroundTilesData: backgroundTileData,
+				tileSize: tileSize,
+				backgroundSpritesData: backgroundSpriteData,
+				characterSpritesMapping: characterSpritesMapping,
+				characterSpriteWidth: characterSpriteWidth,
+				characterSpriteHeight: characterSpriteHeight
+			}
+			var hci = {
+				canvas: canvas,
+				messageOutput: document.getElementById('messages'),
+				engineInitializationSuccessCallback: engineInitializationSuccessCallback
+			}
+
+			var engine = new Engine(factories, sceneConfiguration, resources, hci);
+
+			/*var engine = new Engine(canvas, environmentTilesCanvas, charactersSpritesCanvas, animationPeriod, online, viewPortWidth, viewPortHeight, 
 				gridBlockSize, sceneFactory, cameraFactory, scrollingBufferFactory, characterId, backgroundTileData, tileSize, backgroundSpriteData, 
 				characterSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-				animatedElementFactory, characterFactory, environmentFactory, stompClientFactory);
+				animatedElementFactory, characterFactory, environmentFactory, stompClientFactory, document.getElementById('messages'));*/
 		}
 	)
 }

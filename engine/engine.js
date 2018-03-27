@@ -1,37 +1,37 @@
 /**
  * the engine. contains the the main loop with process the events and render the scene
- * @param {HTML canvas} _displayCanvas    the canvas where the scene will be rendered
- * @param {HTML canvas} environmentCanvas       canvas containing the tiles and sprites for the environment
- * @param {HTML canvas} characterCanvas       canvas containing the sprites for the character
- * @param {integer} animationInterval   the timer in milliseconds use to triger the scene´s animated elements update
- * @param {boolean} online :  use the multiplayer (client-server) mode
- * @param {integer} gridWidth the displayed-grid's width (number of grid element)
- * @param {integer} gridHeight displayed-grid's height (number of grid element)
- * @param {inetger} gridBlockSize size of a grid element
- * @param {SceneFactory} sceneFactory the scene-factory
- * @param {CameraFactory} cameraFactory the camera-factory
- * @param {ScrollingBufferFactory} scrollingBufferFactory the scrolling-buffer-factory
- * @param {integer} characterId the character's appearance's identifier
- * @param {Object} backgroundTileData position-data mapping background-tiles on the environmentCanvas
- * @param {inetger} tileSize the tile-size (square tiles: the width=height=size)
- * @param {Object} backgroundSpriteData position-data mapping environment-sprites on the environmentCanvas
- * @param {Object} charactersSpritesMapping position-data mapping character-sprites on the characterCanvas
- * @param {integer} characterSpriteWidth character sprite's width
- * @param {integer} characterSpriteHeight character sprite's height
- * @param {AnimatedElementFactory} charactersSpritesMapping the animated-element factory
- * @param {CharacterFactory} characterFactory the character factory
- * @param {EnvironmentFactory} environmentFactory the environment factory
- * @param {StompClientFactory} stompClientFactory the stomp-client factory
+ @param {object} sceneConfiguration: an object witht the following properties:
+ 	- gridWidth: the displayed-grid's width (number of grid element)
+ 	- gridHeight: displayed-grid's height (number of grid element)
+ 	- characterId: the character's appearance's identifier
+ 	- animationPeriod: the timer in milliseconds use to triger the scene´s animated elements update
+ 	- gridBlockSize: size of a grid element
+ @param {object} factories: an object witht the following properties:
+	- sceneFactory: the scene-factory
+	- cameraFactory: the camera-factory
+	- environmentFactory: environmentFactory the environment factory
+	- scrollingBufferFactory: the scrolling-buffer-factory
+	- animatedElementFactory: the animated-element factory
+	- characterFactory: characterFactory the character factory
+	- stompClientFactory: stompClientFactory the stomp-client factory
+ @param {object} resources: an object witht the following properties:
+	- charactersCanvas: canvas containing the sprites for the character
+	- environmentCanvas: canvas containing the tiles and sprites for the environment
+	- backgroundTilesData: position-data mapping background-tiles on the environmentCanvas
+	- tileSize: the tile-size (square tiles: the width=height=size)
+	- backgroundSpritesData: position-data mapping environment-sprites on the environmentCanvas
+	- characterSpritesMapping: position-data mapping character-sprites on the characterCanvas
+	- characterSpriteWidth: character sprite's width
+	- characterSpriteHeight: character sprite's height
+ @param {object} hci: an object witht the following properties:
+	- canvas: the canvas where the scene will be rendered
+	- messageOutput: the HTML DIV where message will be output
+	- engineInitializationSuccessCallback: a function without parameter being called when initialization successful and before engine starting
  */
-function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInterval, online, gridWidth, gridHeight, gridBlockSize, 
-	sceneFactory, cameraFactory, scrollingBufferFactory, characterId, backgroundTilesData, tileSsize, backgroundSpritesData, 
-		charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-		animatedElementFactory, characterFactory, environmentFactory, stompClientFactory){
-	this._displayCanvas = displayCanvas;
-	this._animationInterval = animationInterval;
-	this._online = online
-	this._camera = null;
-	this._backgroundBuffer = null;
+function Engine (factories, sceneConfiguration, resources, hci){
+	this._displayCanvas = hci.canvas;
+	this._messageComponent = hci.messageComponent;
+	this._animationInterval = sceneConfiguration.animationPeriod;
 
 	/**
 	 * initialize the renderer after the basic-properties setup
@@ -39,37 +39,43 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 	 */
 	this._initialize = function(){
 		//resize the display canvas using the grid's size and the grid's individual-bloc size
-		var viewPortWidth = gridWidth*gridBlockSize;
-		var viewPortHeight = gridHeight*gridBlockSize;
-		displayCanvas.width = viewPortWidth;
-		displayCanvas.height = viewPortHeight;
-		//create the camera and its view-port
-		if(! this._online){
-			this._scene = sceneFactory.loadFromJson(scene2);
-			//create the camera and its view-port
-			this._camera = cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
-			//create the scrolling-buffer
-			this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene.getEnvironment(), this._displayCanvas.width, this._displayCanvas.height, this._camera);
-			// start the main-loop
-			this.start();
-		}else{
-			//chaining promises
-			//1 - load the scene from the server
-			sceneFactory.loadFromServer('http://localhost:8080', environmentCanvas, characterCanvas, characterId, backgroundTilesData, tileSsize, backgroundSpritesData, 
-				charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-				animatedElementFactory, characterFactory, environmentFactory, stompClientFactory)
-			.then(
-				function(scene){
-					this._scene = scene
-					//create the camera and its view-port
-					this._camera = cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
-					//create the scrolling-buffer
-					this._backgroundBuffer = scrollingBufferFactory.createScrollingBuffer(this._scene._environment, this._displayCanvas.width, this._displayCanvas.height, this._camera);
-					// start the main-loop
-					this.start();
-				}.bind(this)
-			);
-		}
+		var viewPortWidth = sceneConfiguration.gridWidth*sceneConfiguration.gridBlockSize;
+		var viewPortHeight = sceneConfiguration.gridHeight*sceneConfiguration.gridBlockSize;
+		this._displayCanvas.width = viewPortWidth;
+		this._displayCanvas.height = viewPortHeight;
+		//chaining promises
+		//1 - load the scene from the server
+		factories.sceneFactory.loadFromServer(
+			'http://localhost:8080', 
+			resources.environmentCanvas, 
+			resources.charactersCanvas, 
+			sceneConfiguration.characterId, 
+			resources.backgroundTilesData,
+			resources.tileSize,
+			resources.backgroundSpritesData, 
+			resources.characterSpritesMapping, 
+			resources.characterSpriteWidth,
+			resources.characterSpriteHeight,
+			factories.animatedElementFactory, 
+			factories.characterFactory, 
+			factories.environmentFactory, 
+			factories.stompClientFactory)
+		.then(
+			function(scene){
+				this._scene = scene
+				//create the camera and its view-port
+				this._camera = factories.cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
+				//create the scrolling-buffer
+				this._backgroundBuffer = factories.scrollingBufferFactory.createScrollingBuffer(this._scene._environment, this._displayCanvas.width, this._displayCanvas.height, this._camera);
+				// invoke any callback provided	
+				hci.engineInitializationSuccessCallback();
+				// start the main-loop
+				this.start();
+			}.bind(this),
+			function(message){
+				hci.messageOutput.innerHTML = message;
+			}
+		);
 	};
 
 	/**
@@ -95,8 +101,7 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 	this._render = function(){
 		//render the environment
 		this._backgroundBuffer.render(this._camera.getViewPort(), this._displayCanvas);
-		//render the animated elements
-		//depth rendering
+		//sort the scene's sprite by y coordinate to give a depth
 		var elementsToRender = [];
 		elementsToRender.push(this._scene._playableCharacter);
 		Object.keys(this._scene._animatedElements).forEach(
@@ -114,6 +119,7 @@ function Engine (displayCanvas, environmentCanvas, characterCanvas, animationInt
 				return a._currentState.position.y - b._currentState.position.y;
 			}
 		);
+		//render the animated elements
 		elementsToRender.forEach(
 			function(elementToRender) {
 				elementToRender.render(this._camera.getViewPort(), this._displayCanvas);

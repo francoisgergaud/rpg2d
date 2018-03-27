@@ -5,7 +5,6 @@ describe("engine", function() {
   var environmentCanvas = {};
   var characterCanvas = {};
   var animationInterval = 10;
-  var online = true;
   var gridWidth = 10;
   var gridHeight = 10;
   var gridBlockSize = 5;
@@ -20,11 +19,24 @@ describe("engine", function() {
   animatedElement._currentState = { position : {x:0, y:1}};
   var camera = jasmine.createSpyObj('camera', ['getViewPort']);
   var scrollingBuffer = jasmine.createSpyObj('scrollingBuffer', ['render']);
+  var engineInitializationSuccessCallback = jasmine.createSpy('fakeSuccessCallback');
+  var messageOutput={innerHTML:''};
 
   beforeEach(function() {
     jasmine.RequestAnimationFrame.install();
     jasmine.clock().install();
-    var sceneFactory = jasmine.createSpyObj('sceneFactory', ['loadFromServer', 'loadFromJson']);
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
+    jasmine.RequestAnimationFrame.uninstall();
+    engineInitializationSuccessCallback.calls.reset();
+  });
+
+  describe("when scene-factory promise resolves",function(){
+
+    beforeEach(function() {
+      var sceneFactory = jasmine.createSpyObj('sceneFactory', ['loadFromServer', 'loadFromJson']);
       var promiseSceneFactory = new Promise(function(resolve, reject) {
         resolve(
           {
@@ -38,37 +50,98 @@ describe("engine", function() {
       cameraFactory.createCamera.and.returnValue(camera);
       var scrollingBufferFactory = jasmine.createSpyObj('scrollingBufferFactory', ['createScrollingBuffer']);
       scrollingBufferFactory.createScrollingBuffer.and.returnValue(scrollingBuffer);
-      engine = new Engine(mockedDisplayCanvas, environmentCanvas, characterCanvas, animationInterval, online, gridWidth, gridHeight, gridBlockSize, 
-        sceneFactory, cameraFactory, scrollingBufferFactory);
+      var factories={
+        sceneFactory: sceneFactory,
+        cameraFactory: cameraFactory,
+        scrollingBufferFactory: scrollingBufferFactory,
+      };
+      var sceneConfiguration={
+        gridWidth: gridWidth,
+        gridHeight: gridHeight,
+        animationPeriod: animationInterval,
+        gridBlockSize: gridBlockSize
+      };
+      var resources={
+        charactersCanvas: characterCanvas,
+        environmentCanvas: environmentCanvas
+      };
+      var hci={
+        canvas: mockedDisplayCanvas,
+        messageOutput: messageOutput,
+        engineInitializationSuccessCallback: engineInitializationSuccessCallback
+      };
+      engine = new Engine(factories, sceneConfiguration, resources, hci);
       spyOn(engine, 'mainLoop').and.callThrough();
       //by returning the promise, we ensure it has been fulfilled before to test the engine's state
       return promiseSceneFactory;
+    });
+
+    it("should initialize correctly", function() {
+      expect(engine.animationTimer).toBeDefined();
+      expect(engineInitializationSuccessCallback).toHaveBeenCalled();
+    });
+
+    describe('running engine', function() {
+
+      it("should trigger the main-loop on interval expired", function() {  
+        expect(engine.mainLoop).not.toHaveBeenCalled();
+        expect(playableCharacter.animate).not.toHaveBeenCalled();
+        //after time has expired
+        jasmine.clock().tick(animationInterval);
+        expect(engine.mainLoop).toHaveBeenCalled();
+        expect(playableCharacter.animate).toHaveBeenCalled();
+        expect(animatedElement.animate).toHaveBeenCalled();
+        jasmine.RequestAnimationFrame.tick();
+        expect(scrollingBuffer.render).toHaveBeenCalled();
+        expect(playableCharacter.render).toHaveBeenCalled();
+        expect(animatedElement.render).toHaveBeenCalled();
+        expect(environmentSprite.render).toHaveBeenCalled();
+      });
+    });
+
   });
 
-  afterEach(function() {
-    jasmine.clock().uninstall();
-    jasmine.RequestAnimationFrame.uninstall();
-  });
+  describe("when scene-factory promise reject",function(){
 
-  it("should initialize correctly", function() {
-    expect(engine.animationTimer).toBeDefined();
-  });
+    beforeEach(function(done) {
+      var sceneFactory = jasmine.createSpyObj('sceneFactory', ['loadFromServer', 'loadFromJson']);
+      var promiseSceneFactory = new Promise(function(resolve, reject) {
+          reject("error while initializing");
+      });
+      sceneFactory.loadFromServer.and.returnValue(promiseSceneFactory);
+      var cameraFactory = jasmine.createSpyObj('cameraFactory', ['createCamera']);
+      cameraFactory.createCamera.and.returnValue(camera);
+      var scrollingBufferFactory = jasmine.createSpyObj('scrollingBufferFactory', ['createScrollingBuffer']);
+      scrollingBufferFactory.createScrollingBuffer.and.returnValue(scrollingBuffer);
+      var factories={
+        sceneFactory: sceneFactory,
+        cameraFactory: cameraFactory,
+        scrollingBufferFactory: scrollingBufferFactory,
+      };
+      var sceneConfiguration={
+        gridWidth: gridWidth,
+        gridHeight: gridHeight,
+        animationPeriod: animationInterval,
+        gridBlockSize: gridBlockSize
+      };
+      var resources={
+        charactersCanvas: characterCanvas,
+        environmentCanvas: environmentCanvas
+      };
+      var hci={
+        canvas: mockedDisplayCanvas,
+        messageOutput: messageOutput,
+        engineInitializationSuccessCallback: engineInitializationSuccessCallback
+      };
+      engine = new Engine(factories, sceneConfiguration, resources, hci);
+      spyOn(engine, 'mainLoop').and.callThrough();
+      done();
+    });
 
-  describe('running engine', function() {
-
-    it("should trigger the main-loop on interval expired", function() {  
-      expect(engine.mainLoop).not.toHaveBeenCalled();
-      expect(playableCharacter.animate).not.toHaveBeenCalled();
-      //after time has expired
-      jasmine.clock().tick(animationInterval);
-      expect(engine.mainLoop).toHaveBeenCalled();
-      expect(playableCharacter.animate).toHaveBeenCalled();
-      expect(animatedElement.animate).toHaveBeenCalled();
-      jasmine.RequestAnimationFrame.tick();
-      expect(scrollingBuffer.render).toHaveBeenCalled();
-      expect(playableCharacter.render).toHaveBeenCalled();
-      expect(animatedElement.render).toHaveBeenCalled();
-      expect(environmentSprite.render).toHaveBeenCalled();
+    it("should display an message when failing to initialize", function() {
+      expect(engineInitializationSuccessCallback).not.toHaveBeenCalled();
+      expect(messageOutput.innerHTML).toBe("error while initializing");
     });
   });
+  
 });

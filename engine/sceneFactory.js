@@ -112,7 +112,6 @@ function SceneFactory() {
 					scene._animatedElements = animatedElements;
 					//TODO: create- factory for STOMP client
 					stompClientFactory.createStompClient(serverBaseURL, scene);
-					//scene.listenToServer(serverBaseURL, this);
 				    resolve(scene);
 				}
 			});

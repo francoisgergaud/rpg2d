@@ -44,6 +44,7 @@ function OnlineScene(sceneFactory){
 	 * @return {None}
 	 */
 	this.subscribe = function(stompClient){
+		this.stompClient=stompClient;
 		stompClient.subscribe(
     		'/topic/newPlayer', 
     		function (data) {
@@ -62,7 +63,6 @@ function OnlineScene(sceneFactory){
         		console.log(data);
         	}.bind(this)
         );
-        this._playableCharacter.stompClient=stompClient;
 	}
 
 	/**
