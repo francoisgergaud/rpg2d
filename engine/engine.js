@@ -44,7 +44,7 @@ function Engine (factories, sceneConfiguration, resources, hci){
 		this._displayCanvas.width = viewPortWidth;
 		this._displayCanvas.height = viewPortHeight;
 		//load the scene from the server
-		factories.sceneFactory.loadFromServer('http://localhost:8080', resources, sceneConfiguration, factories)
+		factories.sceneFactory.loadFromServer('http://localhost:8080', resources, sceneConfiguration, factories, hci)
 		.then(
 			function(scene){
 				this._scene = scene
@@ -58,7 +58,7 @@ function Engine (factories, sceneConfiguration, resources, hci){
 				this.start();
 			}.bind(this),
 			function(message){
-				hci.messageOutput.innerHTML = message;
+				hci.connectionMessagesOutput.innerHTML = message;
 			}
 		);
 	};

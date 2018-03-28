@@ -2,8 +2,10 @@
  * online-scene: manage scene by listening a server using web-socket and STOMP client
  * @param {SceneFactory} sceneFactory the scene factory used to build this scene (a reference is need to invoke the 
  * createAnimatedElementFromServerData method from the scene-factory)
+ * @param {object} hci the GUI elements
+ * 
  */
-function OnlineScene(sceneFactory){
+function OnlineScene(sceneFactory, hci){
 
 	/**
 	 * the scene-factory use to build this scene
@@ -11,6 +13,7 @@ function OnlineScene(sceneFactory){
 	 * Not sure it is the right-place to be
 	 */
 	this._sceneFactory = sceneFactory;
+	this._hci = hci;
 
 	//invoke the parent constructor
 	Scene.call(this, null, null, null);
@@ -23,6 +26,7 @@ function OnlineScene(sceneFactory){
 	this.registerNewPlayer = function(data){
 		var character = this._sceneFactory.createAnimatedElementFromServerData(data);
 		this._animatedElements[character._id] = character;
+		this._hci.messagesOutput.innerHTML += data.name + ' joined the game.<br/>';
 	};
 
 	/**

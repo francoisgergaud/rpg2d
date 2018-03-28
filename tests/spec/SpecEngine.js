@@ -20,7 +20,7 @@ describe("engine", function() {
   var camera = jasmine.createSpyObj('camera', ['getViewPort']);
   var scrollingBuffer = jasmine.createSpyObj('scrollingBuffer', ['render']);
   var engineInitializationSuccessCallback = jasmine.createSpy('fakeSuccessCallback');
-  var messageOutput={innerHTML:''};
+  var connectionMessagesOutput={innerHTML:''};
 
   beforeEach(function() {
     jasmine.RequestAnimationFrame.install();
@@ -67,7 +67,7 @@ describe("engine", function() {
       };
       var hci={
         canvas: mockedDisplayCanvas,
-        messageOutput: messageOutput,
+        connectionMessagesOutput: connectionMessagesOutput,
         engineInitializationSuccessCallback: engineInitializationSuccessCallback
       };
       engine = new Engine(factories, sceneConfiguration, resources, hci);
@@ -130,7 +130,7 @@ describe("engine", function() {
       };
       var hci={
         canvas: mockedDisplayCanvas,
-        messageOutput: messageOutput,
+        connectionMessagesOutput: connectionMessagesOutput,
         engineInitializationSuccessCallback: engineInitializationSuccessCallback
       };
       engine = new Engine(factories, sceneConfiguration, resources, hci);
@@ -140,7 +140,7 @@ describe("engine", function() {
 
     it("should display an message when failing to initialize", function() {
       expect(engineInitializationSuccessCallback).not.toHaveBeenCalled();
-      expect(messageOutput.innerHTML).toBe("error while initializing");
+      expect(connectionMessagesOutput.innerHTML).toBe("error while initializing");
     });
   });
   

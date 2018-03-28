@@ -9,8 +9,9 @@ function SceneFactory() {
 	 * @param {object} resources resources for the scene
 	 * @param {object} sceneConfiguration configuration for the scene
 	 * @param {object} factories factories (DI)
+	 * @param {object} hci the GUI elements
 	 */
-	this.loadFromServer = function(serverBaseURL, resources, sceneConfiguration, factories){
+	this.loadFromServer = function(serverBaseURL, resources, sceneConfiguration, factories, hci){
 		// store the characters meta-information to be able to create new one when onlineScene.registerNewPlayer is called
 		this.charactersSpritesMapping = resources.characterSpritesMapping;
 		this.characterSpriteWidth = resources.characterSpriteWidth;
@@ -20,11 +21,11 @@ function SceneFactory() {
 		var characterId = sceneConfiguration.characterId;
 		//build the promise to be return. This promise resolves when response is received from server and processed correctly
 		var promise = new Promise(function(resolve, reject) {
-			var scene = new OnlineScene(this);
+			var scene = new OnlineScene(this, hci);
 			$.ajax({
 				context: this,
 				url: serverBaseURL+'/registerPlayer',
-				data: JSON.stringify({id: 'jean-michel', characterId: characterId}),
+				data: JSON.stringify({id: sceneConfiguration.username, characterId: characterId}),
 				method: 'POST',
 				contentType: 'application/json; charset=utf-8',
 				dataType : 'json',

@@ -18,7 +18,6 @@ function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
 			//setup the view-port and its display canvas
 			var viewPortWidth = 40;
 			var viewPortHeight = 30;
-			var online = true;
 			//get the canvas after resource load
 			var charactersSpritesCanvas = imagesCanvas[0];
 			var environmentTilesCanvas = imagesCanvas[1];
@@ -36,8 +35,8 @@ function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
 			var sceneConfiguration = {
 				gridWidth: viewPortWidth,
 				gridHeight: viewPortHeight,
-				online: online,
 				characterId: characterId,
+				username: username,
 				animationPeriod: animationPeriod,
 				gridBlockSize: gridBlockSize
 			}
@@ -62,7 +61,8 @@ function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
 			}
 			var hci = {
 				canvas: canvas,
-				messageOutput: document.getElementById('messages'),
+				connectionMessagesOutput: document.getElementById('connectionMessages'),
+				messagesOutput: document.getElementById('messages'),
 				engineInitializationSuccessCallback: engineInitializationSuccessCallback
 			}
 

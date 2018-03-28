@@ -62,12 +62,14 @@ describe("online-scene factory", function() {
     characterFactory: characterFactory,
     stompClientFactory: stompClientFactory
   };
-    
+  var hci = {
+    messagesOutput : {innerHTML:''}
+  };
   beforeEach(function() {
     jasmine.Ajax.install();
     spyOn(animatedElementFactory, 'createAnimatedElement');
     animatedElementFactory.createAnimatedElement.and.returnValue({_id : animatedElementId});
-    sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, resources, sceneConfiguration, factories);
+    sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, resources, sceneConfiguration, factories, hci);
     httpRequest = jasmine.Ajax.requests.mostRecent();
     
     httpRequest.respondWith({
@@ -157,6 +159,7 @@ describe("online-scene factory", function() {
         notParsedJsonData = {'body' : '{"id" : "player2", "currentState" : "fakeState"}'};
         stompClient.callbacks[1](notParsedJsonData);
         expect(scene._animatedElements['player2']._currentState).toEqual('fakeState');
+        expect(scene._hci.messagesOutput.innerHTML.length).toBeGreaterThan(0);
       });
     });
   });
