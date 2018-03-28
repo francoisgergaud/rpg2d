@@ -2,7 +2,6 @@
  * TODO: inherit a playable character from this class. only the playable character can be online
  * a playable character. The view-port will be centered on it
  * @param id {string} character´s identifier
- * @param {boolean} online is it a playable character online
  * @param spritesCanvas {HTML cancas} the canvas containing the sprties
  * @param animationData {Array} : contains the sprite-data (TODO: add more details about the structure)
  * @param spriteWidth {Integer} the sprite's width
@@ -10,10 +9,9 @@
  * @param scene {object} the scene the character is part-of
  * @param $window {object} obect sending events
  */
-function Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
+function Character(id, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
 
 	AnimatedElement.call(this, id, spritesCanvas, animationData, spriteWidth, spriteHeight);
-	this._online = online;
 	this._scene = scene;
 	
 	/**
@@ -112,7 +110,7 @@ function CharacterFactory(){
 	 * create a character
 	 * @return {Character} the camera created
 	 */
-	this.createCharacter = function(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
-		return new Character(id, online, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window);
+	this.createCharacter = function(id, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window){
+		return new Character(id, spritesCanvas, animationData, spriteWidth, spriteHeight, scene, $window);
 	}
 }

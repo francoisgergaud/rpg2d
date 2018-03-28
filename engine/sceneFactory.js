@@ -4,64 +4,20 @@
 function SceneFactory() {
 
 	/**
-	 * load the scene from static content
-	 * @param  {Object} jsonData data describin gthe scene (see data folder for examples)
-	 * @return {Scene}  the created scene
-	 */
-	this.loadFromJson = function(jsonData){
-		var environment = new Environment(
-			jsonData.environment.spriteFilename, 
-			jsonData.environment.backgroundSpriteData, 
-			jsonData.environment.spriteSize
-		);
-		var playableCharacter = new Character(
-			"playableCharacter",
-			false,
-			jsonData.playableCharacter.spriteFilename, 
-			jsonData.playableCharacter.animationData,
-			jsonData.playableCharacter.spriteSize,
-			window
-		);
-		var animatedElements = {};
-		jsonData.animatedElements.forEach(function(animatedElementDefinition){
-			var animatedElementId = (Math.random() * 10);
-			var animatedElement = new AnimatedElement(
-				animatedElementId,
-				false,
-				animatedElementDefinition.spriteFilename, 
-				animatedElementDefinition.animationData,
-				animatedElementDefinition.spriteSize
-			);
-			animatedElement.processEvents = animatedElementDefinition.processEvents;
-			animatedElements[animatedElementId] = animatedElement;
-		});
-		var scene =  new Scene(playableCharacter, animatedElements, environment);
-		return scene;
-	};
-
-	/**
 	 * register a player online and get the scene information
 	 * @param {string} serverBaseURL  the server's base-URL
-	 * @param {HTML canvas} environmentCanvas       canvas containing the tiles and sprites for the environment
-	 * @param {HTML canvas} characterCanvas       canvas containing the sprites for the character
-	 * @param {integer} characterId character-appearance identifier
-	 * @param {Object} backgroundTileData position-data mapping background-tiles on the environmentCanvas
-	 * @param {inetger} tileSize the tile-size (square tiles: the width=height=size)
-	 * @param {Object} backgroundSpriteData position-data mapping environment-sprites on the environmentCanvas
-	 * @param {EnvironmentFactory} environmentFactory the environment-factory
-	 * @param {Object} charactersSpritesMapping position-data mapping characters on the characterCanvas
-	 * @param {StompClientFactory} stompClientFactory the stomp-client factory
-	 * @return {Promise} the promise to be resolve for callback trigger
+	 * @param {object} resources resources for the scene
+	 * @param {object} sceneConfiguration configuration for the scene
+	 * @param {object} factories factories (DI)
 	 */
-	this.loadFromServer = function(serverBaseURL, environmentCanvas, characterCanvas, characterId, backgroundTileData, tileSize, 
-		backgroundSpriteData, charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-		animatedElementFactory, characterFactory, environmentFactory, stompClientFactory){
+	this.loadFromServer = function(serverBaseURL, resources, sceneConfiguration, factories){
 		// store the characters meta-information to be able to create new one when onlineScene.registerNewPlayer is called
-		this._characterCanvas = characterCanvas;
-		this.charactersSpritesMapping = charactersSpritesMapping;
-		this.characterSpriteWidth = characterSpriteWidth;
-		this.characterSpriteHeight = characterSpriteHeight;
-		this.animatedElementFactory = animatedElementFactory;
+		this.charactersSpritesMapping = resources.characterSpritesMapping;
+		this.characterSpriteWidth = resources.characterSpriteWidth;
+		this.characterSpriteHeight = resources.characterSpriteHeight;
+		this.animatedElementFactory = factories.animatedElementFactory;
+		this._characterCanvas = resources.charactersCanvas;
+		var characterId = sceneConfiguration.characterId;
 		//build the promise to be return. This promise resolves when response is received from server and processed correctly
 		var promise = new Promise(function(resolve, reject) {
 			var scene = new OnlineScene(this);
@@ -77,23 +33,22 @@ function SceneFactory() {
 				  reject("error while registering player");
 				},
 				success: function(data){
-					var environment = environmentFactory.createEnvironment(
-						environmentCanvas, 
-						backgroundTileData, 
-						tileSize, 
-						backgroundSpriteData, 
+					var environment = factories.environmentFactory.createEnvironment(
+						resources.environmentCanvas, 
+						resources.backgroundTilesData, 
+						resources.tileSize, 
+						resources.backgroundSpritesData, 
 						data.worldElements, 
 						data.map
 					);
 					scene._environment = environment;
 					//sprite-mapping is defined in the data/resources/sprite mapping
-					var playableCharacter = characterFactory.createCharacter(
+					var playableCharacter = factories.characterFactory.createCharacter(
 						data.playerId,
-						true, 
-						this._characterCanvas, 
-						this.charactersSpritesMapping[characterId], 
-						this.characterSpriteWidth, 
-						this.characterSpriteHeight, 
+						resources.charactersCanvas, 
+						resources.characterSpritesMapping[characterId], 
+						resources.characterSpriteWidth, 
+						resources.characterSpriteHeight, 
 						scene,
 						window
 					);
@@ -111,7 +66,7 @@ function SceneFactory() {
 					);
 					scene._animatedElements = animatedElements;
 					//TODO: create- factory for STOMP client
-					stompClientFactory.createStompClient(serverBaseURL, scene);
+					factories.stompClientFactory.createStompClient(serverBaseURL, scene);
 				    resolve(scene);
 				}
 			});

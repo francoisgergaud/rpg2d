@@ -18,7 +18,6 @@ function Environment(spritesCanvas, tilesData, tileSize, spriteData, spritesInfo
 
 	/**
 	 * initialize the object with the required data
-	 * TODO: remove for online mode
 	 */
 	this._initialize = function(spritesInformation){
 		spritesInformation.forEach(

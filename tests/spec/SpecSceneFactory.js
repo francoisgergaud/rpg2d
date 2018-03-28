@@ -43,14 +43,31 @@ describe("online-scene factory", function() {
     playerId : playerId,
     animatedElements : animatedElements
   };
+  var resources = {
+    environmentCanvas: environmentCanvas,
+    backgroundTilesData: backgroundTileData,
+    tileSize: tileSize,
+    backgroundSpritesData: backgroundSpriteData,
+    charactersCanvas: characterCanvas,
+    characterSpritesMapping: charactersSpritesMapping,
+    characterSpriteWidth: characterSpriteWidth,
+    characterSpriteHeight: characterSpriteHeight
+  };
+  var sceneConfiguration = {
+    characterId: characterId
+  };
+  var factories = {
+    animatedElementFactory: animatedElementFactory,
+    environmentFactory: environmentFactory,
+    characterFactory: characterFactory,
+    stompClientFactory: stompClientFactory
+  };
     
   beforeEach(function() {
     jasmine.Ajax.install();
     spyOn(animatedElementFactory, 'createAnimatedElement');
     animatedElementFactory.createAnimatedElement.and.returnValue({_id : animatedElementId});
-    sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, environmentCanvas, characterCanvas, characterId, backgroundTileData, tileSize, 
-    backgroundSpriteData, charactersSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-    animatedElementFactory, characterFactory, environmentFactory, stompClientFactory);
+    sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, resources, sceneConfiguration, factories);
     httpRequest = jasmine.Ajax.requests.mostRecent();
     
     httpRequest.respondWith({
@@ -93,12 +110,11 @@ describe("online-scene factory", function() {
   it("should create online-scene's character correctly", function() {
     expect(characterFactory.createCharacter).toHaveBeenCalled();
     expect(characterFactory.createCharacter.calls.argsFor(0)[0]).toBe(playerId);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[1]).toBe(true);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[2]).toBe(characterCanvas);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[3]).toBe(characterAnimationData);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[4]).toEqual(characterSpriteWidth);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[5]).toEqual(characterSpriteHeight);
-    expect(characterFactory.createCharacter.calls.argsFor(0)[6]).toEqual(jasmine.any(OnlineScene));
+    expect(characterFactory.createCharacter.calls.argsFor(0)[1]).toBe(characterCanvas);
+    expect(characterFactory.createCharacter.calls.argsFor(0)[2]).toBe(characterAnimationData);
+    expect(characterFactory.createCharacter.calls.argsFor(0)[3]).toEqual(characterSpriteWidth);
+    expect(characterFactory.createCharacter.calls.argsFor(0)[4]).toEqual(characterSpriteHeight);
+    expect(characterFactory.createCharacter.calls.argsFor(0)[5]).toEqual(jasmine.any(OnlineScene));
     expect(scene._playableCharacter).toBe(playableCharacter);
   });
 

@@ -43,23 +43,8 @@ function Engine (factories, sceneConfiguration, resources, hci){
 		var viewPortHeight = sceneConfiguration.gridHeight*sceneConfiguration.gridBlockSize;
 		this._displayCanvas.width = viewPortWidth;
 		this._displayCanvas.height = viewPortHeight;
-		//chaining promises
-		//1 - load the scene from the server
-		factories.sceneFactory.loadFromServer(
-			'http://localhost:8080', 
-			resources.environmentCanvas, 
-			resources.charactersCanvas, 
-			sceneConfiguration.characterId, 
-			resources.backgroundTilesData,
-			resources.tileSize,
-			resources.backgroundSpritesData, 
-			resources.characterSpritesMapping, 
-			resources.characterSpriteWidth,
-			resources.characterSpriteHeight,
-			factories.animatedElementFactory, 
-			factories.characterFactory, 
-			factories.environmentFactory, 
-			factories.stompClientFactory)
+		//load the scene from the server
+		factories.sceneFactory.loadFromServer('http://localhost:8080', resources, sceneConfiguration, factories)
 		.then(
 			function(scene){
 				this._scene = scene

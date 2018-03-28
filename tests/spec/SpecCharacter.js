@@ -19,8 +19,7 @@ describe("character", function() {
   });
 
   it("initializes correctly", function() {
-    character = new Character(characterId, true, mockSpriteCanvas, animationData, spriteWidth, spriteHeight, scene, $window);
-    expect(character._online).toEqual(true);
+    character = new Character(characterId, mockSpriteCanvas, animationData, spriteWidth, spriteHeight, scene, $window);
     expect(character._scene).toEqual(scene);
     expect(character._preAnimateListeners.length).toEqual(1);
     expect($window.addEventListener).toHaveBeenCalledTimes(2);
