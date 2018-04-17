@@ -37,13 +37,12 @@
 					Canvas not supported
 					</canvas>
 			    </div>
-			    <div class="pure-u-1-3" id="messages">
-			    	Notification receiver
+			    <div class="pure-u-1-3" id="messagesOutput">
 			    </div>
 			</div>
 			<div class="pure-g">
 			    <div class="pure-u-3-3">
-			    	Notification sender
+			    	<input itype="text" id="chatInput">
 			    </div>
 			</div>
 			<script type="text/javascript">
@@ -61,7 +60,12 @@
 				 */
 				function connect(username){
 					gameBootstrap(
-						document.getElementById("canvas"), 
+						{
+							canvas: document.getElementById("canvas"),
+							chatInput: document.getElementById("chatInput"), 
+							messageOutput: document.getElementById("messagesOutput"),
+							connectionMessages: document.getElementById('connectionMessages')
+						},
 						document.getElementById('username').value, 
 						function(){
 							document.getElementById("connection").style.display="none";

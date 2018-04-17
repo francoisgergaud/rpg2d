@@ -9,7 +9,7 @@ var animationPeriod = 40;
  * @param  {Canvas} canvas the canvas DOM Element used for rendering
  * @return {None} 
  */
-function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
+function gameBootstrap(guiElements, username, engineInitializationSuccessCallback){
 	var promises = [];
 	promises.push(getCanvasContextFromUrl(characterSpritesFilename));
 	promises.push(getCanvasContextFromUrl(backgroundTileFilename));
@@ -60,18 +60,14 @@ function gameBootstrap(canvas, username, engineInitializationSuccessCallback){
 				characterSpriteHeight: characterSpriteHeight
 			}
 			var hci = {
-				canvas: canvas,
-				connectionMessagesOutput: document.getElementById('connectionMessages'),
-				messagesOutput: document.getElementById('messages'),
+				canvas: guiElements.canvas,
+				connectionMessagesOutput: guiElements.connectionMessages,
+				messagesOutput: guiElements.messageOutput,
+				chatInput: guiElements.chatInput,
 				engineInitializationSuccessCallback: engineInitializationSuccessCallback
 			}
 
 			var engine = new Engine(factories, sceneConfiguration, resources, hci);
-
-			/*var engine = new Engine(canvas, environmentTilesCanvas, charactersSpritesCanvas, animationPeriod, online, viewPortWidth, viewPortHeight, 
-				gridBlockSize, sceneFactory, cameraFactory, scrollingBufferFactory, characterId, backgroundTileData, tileSize, backgroundSpriteData, 
-				characterSpritesMapping, characterSpriteWidth, characterSpriteHeight,
-				animatedElementFactory, characterFactory, environmentFactory, stompClientFactory, document.getElementById('messages'));*/
 		}
 	)
 }

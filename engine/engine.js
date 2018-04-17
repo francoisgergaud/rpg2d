@@ -47,7 +47,8 @@ function Engine (factories, sceneConfiguration, resources, hci){
 		factories.sceneFactory.loadFromServer('http://localhost:8080', resources, sceneConfiguration, factories, hci)
 		.then(
 			function(scene){
-				this._scene = scene
+				this._scene = scene;
+				//scene.createChatListener(hci.chatInput);
 				//create the camera and its view-port
 				this._camera = factories.cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
 				//create the scrolling-buffer

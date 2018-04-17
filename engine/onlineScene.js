@@ -85,8 +85,22 @@ function OnlineScene(sceneFactory, hci){
 			this.stompClient.send(url, {}, JSON.stringify(event.data));
 		}else{
 			console.log('Local-event could not be identified.');
-		}
-		
+		}	
+	}
+
+	/**
+	 * initialize the listener for the chat input. Basically, if the enter key is pressed, it parses  the
+	 * input's text. If it is in the right format, it sends it to the server.
+	 * TODO: set the destination-list from a more intuitive component (autocomplete select)
+	 * @param  {HTML input element} chatInputElement the HTML element
+	 */
+	this.createChatListener = function(chatInputElement){
+		let chatMessageRegex = /(\[*\])/;
+		chatInputElement.onkeypress = function(e){
+			if(e.keyCode == 13){
+				var chatMessage = chatMessageRegex.exec(chatInputElement.text);
+			}
+		};
 	}
 }
 //inherit the OnlineScene object from Scene object
@@ -99,24 +113,9 @@ function StompClientFactory(){
 
 	/**
 	 * create a STOMP client
-	 * @param  {string} serverBaseURL the server base URL
-	 * @param  {[OnlineScene} onlineScene   the online scene onvoking the subsription
-	 * @param {SceneFactory} sceneFactory the scene factory
-	 * @return {STOMP client} the STOMP client created
+	 * @param  {string} url the URL to create a websocket on
 	 */
-	this.createStompClient = function(serverBaseURL, onlineScene){
-		var socket = new SockJS(serverBaseURL+'/gameServer');
-		stompClient = Stomp.over(socket);
-	    stompClient.connect(
-	    	{},
-	    	function () {
-		    	onlineScene.subscribe(stompClient);
-		    	console.log("stomp-client initialized correctly");
-		    }, 
-		    function(){
-		    	console.log("error while subscribing stomp-client to server using web-socket");
-		    }
-		 );
-	    return stompClient;
+	this.createStompClient = function(url){
+	    return Stomp.over(new SockJS(url));
 	}
 }

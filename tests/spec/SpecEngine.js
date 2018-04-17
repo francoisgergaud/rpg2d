@@ -35,7 +35,7 @@ describe("engine", function() {
 
   describe("when scene-factory promise resolves",function(){
 
-    beforeEach(function() {
+    beforeEach(function(done) {
       var sceneFactory = jasmine.createSpyObj('sceneFactory', ['loadFromServer', 'loadFromJson']);
       var promiseSceneFactory = new Promise(function(resolve, reject) {
         resolve(
@@ -44,6 +44,7 @@ describe("engine", function() {
             _playableCharacter : playableCharacter,
             _animatedElements : [animatedElement]
           });
+          done();
       });
       sceneFactory.loadFromServer.and.returnValue(promiseSceneFactory);
       var cameraFactory = jasmine.createSpyObj('cameraFactory', ['createCamera']);

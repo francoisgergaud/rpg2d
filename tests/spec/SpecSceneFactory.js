@@ -3,7 +3,6 @@ describe("online-scene factory", function() {
   var serverBaseURL = 'fakeUrl';
   var environmentCanvas = {};
   var characterCanvas = {};
-  var sceneCreationPromise = null;
   var httpRequest = null;
   //for easiness of test, the character and the animated-element returned in the fake-scene share the same data
   var characterId = 0;
@@ -32,6 +31,30 @@ describe("online-scene factory", function() {
   environmentFactory.createEnvironment.and.returnValue(fakeEnvironment);
   // the STOMP -client factory
   var stompClientFactory = jasmine.createSpyObj('stompClientFactory',['createStompClient']);
+  
+  //var stompClient = jasmine.createSpyObj('stompClient',['connect', 'subscribe', 'send']);
+  var stompClient = new function(){
+
+    this.reset = function(){
+      this.connectCallbacks = [];
+      this.subscribeCallbacks = [];
+      this.sendCallbacksArguments = [];
+    };
+    this.connect = function(headers, successCallback, failCallback){
+      this.connectCallbacks.push(successCallback);
+    };
+    this.subscribe = function(path, successCallback, failCallback){
+      this.subscribeCallbacks.push(successCallback);
+    };
+    this.send = function(path, headers, data){
+      this.sendCallbacksArguments.push({path: path, data: data, headers: headers});
+    };
+
+    this.reset();
+  };
+
+
+  stompClientFactory.createStompClient.and.returnValue(stompClient);
   var sceneFactory = new SceneFactory();
   var playerId = "fakePlayerId";
   var animatedElements = {};
@@ -65,26 +88,30 @@ describe("online-scene factory", function() {
   var hci = {
     messagesOutput : {innerHTML:''}
   };
-  beforeEach(function() {
-    jasmine.Ajax.install();
+
+  beforeEach(function(done) {
     spyOn(animatedElementFactory, 'createAnimatedElement');
     animatedElementFactory.createAnimatedElement.and.returnValue({_id : animatedElementId});
-    sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, resources, sceneConfiguration, factories, hci);
-    httpRequest = jasmine.Ajax.requests.mostRecent();
-    
-    httpRequest.respondWith({
-      status : 200,
-      responseText : JSON.stringify(sceneFromServer)
-    });
-    return sceneCreationPromise.then(
+    stompClient.reset();
+    var sceneCreationPromise = sceneFactory.loadFromServer(serverBaseURL, resources, sceneConfiguration, factories, hci);
+    sceneCreationPromise.then(
       function(sceneResult){
         scene = sceneResult;
+        done();
+      },
+      function(error){
+        log.console(error);
+        done();
       }
     );
-  });
-
-  afterEach(function() {
-    jasmine.Ajax.uninstall();
+    expect(stompClientFactory.createStompClient).toHaveBeenCalled();
+    expect(stompClient.connectCallbacks.length).toBe(1);
+    var connectCallback = stompClient.connectCallbacks[0];
+    connectCallback();
+    expect(stompClient.subscribeCallbacks.length).toBe(1);
+    var subscribeCallback = stompClient.subscribeCallbacks[0];
+    subscribeCallback({body:JSON.stringify(sceneFromServer)});
+        
   });
 
   it("should create online-scene's environment correctly", function() {
@@ -121,9 +148,8 @@ describe("online-scene factory", function() {
   });
 
   it("should create online-scene's STOMP client", function() {
-    expect(stompClientFactory.createStompClient).toHaveBeenCalled();
-    expect(stompClientFactory.createStompClient.calls.argsFor(0)[0]).toBe(serverBaseURL);
-    expect(stompClientFactory.createStompClient.calls.argsFor(0)[1]).toEqual(jasmine.any(OnlineScene));
+    expect(stompClient.sendCallbacksArguments.length).toBe(1);
+    expect(stompClient.sendCallbacksArguments[0].path).toBe("/app/registerPlayer");
   });
 
   describe("when subscribing to server", function(){

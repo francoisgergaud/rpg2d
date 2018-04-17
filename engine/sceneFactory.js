@@ -20,58 +20,61 @@ function SceneFactory() {
 		this._characterCanvas = resources.charactersCanvas;
 		var characterId = sceneConfiguration.characterId;
 		//build the promise to be return. This promise resolves when response is received from server and processed correctly
-		var promise = new Promise(function(resolve, reject) {
-			var scene = new OnlineScene(this, hci);
-			$.ajax({
-				context: this,
-				url: serverBaseURL+'/registerPlayer',
-				data: JSON.stringify({id: sceneConfiguration.username, characterId: characterId}),
-				method: 'POST',
-				contentType: 'application/json; charset=utf-8',
-				dataType : 'json',
-				characterId : characterId,
-				error: function() {
-				  reject("error while registering player");
-				},
-				success: function(data){
-					var environment = factories.environmentFactory.createEnvironment(
-						resources.environmentCanvas, 
-						resources.backgroundTilesData, 
-						resources.tileSize, 
-						resources.backgroundSpritesData, 
-						data.worldElements, 
-						data.map
-					);
-					scene._environment = environment;
-					//sprite-mapping is defined in the data/resources/sprite mapping
-					var playableCharacter = factories.characterFactory.createCharacter(
-						data.playerId,
-						resources.charactersCanvas, 
-						resources.characterSpritesMapping[characterId], 
-						resources.characterSpriteWidth, 
-						resources.characterSpriteHeight, 
-						scene,
-						window
-					);
-					scene._playableCharacter = playableCharacter;
-					var animatedElements = {};
-					Object.keys(data.animatedElements).forEach(
-						function(id, index) {
-							//the player is also part of the animated-elements returned. We must skip it
-							if(id != data.playerId){
-								var character = this.createAnimatedElementFromServerData(data.animatedElements[id]);
-								animatedElements[character._id] = character;
-							}
-						},
-						this
-					);
-					scene._animatedElements = animatedElements;
-					//TODO: create- factory for STOMP client
-					factories.stompClientFactory.createStompClient(serverBaseURL, scene);
-				    resolve(scene);
-				}
-			});
-		}.bind(this));
+		var promise = new Promise(
+			function(resolve, reject) {
+				var scene = new OnlineScene(this, hci);
+				var stompClient = factories.stompClientFactory.createStompClient(serverBaseURL+'/gameServer');
+				stompClient.connect(
+			    	{},
+			    	function(){
+				    	stompClient.subscribe(
+					    	'/user/queue/registerPlayer', 
+					    	function(frame){
+						    	data=JSON.parse(frame.body);
+						        var environment = factories.environmentFactory.createEnvironment(
+									resources.environmentCanvas, 
+									resources.backgroundTilesData, 
+									resources.tileSize, 
+									resources.backgroundSpritesData, 
+									data.worldElements, 
+									data.map
+								);
+								scene._environment = environment;
+								//sprite-mapping is defined in the data/resources/sprite mapping
+								var playableCharacter = factories.characterFactory.createCharacter(
+									data.playerId,
+									resources.charactersCanvas, 
+									resources.characterSpritesMapping[characterId], 
+									resources.characterSpriteWidth, 
+									resources.characterSpriteHeight, 
+									scene,
+									window
+								);
+								scene._playableCharacter = playableCharacter;
+								var animatedElements = {};
+								Object.keys(data.animatedElements).forEach(
+									function(id, index) {
+										//the player is also part of the animated-elements returned. We must skip it
+										if(id != data.playerId){
+											var character = this.createAnimatedElementFromServerData(data.animatedElements[id]);
+											animatedElements[character._id] = character;
+										}
+									}.bind(this),
+									this
+								);
+								scene._animatedElements = animatedElements;
+								scene.subscribe(stompClient);
+								resolve(scene);
+						     }.bind(this)
+						);
+						stompClient.send("/app/registerPlayer", {}, JSON.stringify({id: sceneConfiguration.username, characterId: characterId}));
+					}.bind(this)
+				);
+			}.bind(this), 
+		    function(){
+		    	reject("error while registering player: stomp-client not initialized correctly");
+		    }
+		);
 		return promise;
 	};
 	
