@@ -91,6 +91,7 @@ function SceneFactory() {
 			this.characterSpriteWidth,
 	   		this.characterSpriteHeight
 	   	);
+	   	character.name = animatedElementData.name;
 	   	character._currentState = animatedElementData.currentState;
 	   	return character;
 	};

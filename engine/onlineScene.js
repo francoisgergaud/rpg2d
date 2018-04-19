@@ -26,7 +26,18 @@ function OnlineScene(sceneFactory, hci){
 	this.registerNewPlayer = function(data){
 		var character = this._sceneFactory.createAnimatedElementFromServerData(data);
 		this._animatedElements[character._id] = character;
-		this._hci.messagesOutput.innerHTML += data.name + ' joined the game.<br/>';
+		this._hci.messagesOutput.innerHTML += character.name + ' joined the game.<br/>';
+	};
+
+	/**
+	 * triggered when the server send a remove-player event. Remove the player from the list of animated-elements
+	 * @param  {Object} data JSON data sent by the server
+	 * @return {None}
+	 */
+	this.unregisterPlayer = function(characterId){
+		var playerToRemove = this._animatedElements[characterId];
+		delete this._animatedElements[characterId];
+		this._hci.messagesOutput.innerHTML += playerToRemove.name + ' quit the game.<br/>';
 	};
 
 	/**
@@ -53,6 +64,12 @@ function OnlineScene(sceneFactory, hci){
     		'/topic/newPlayer', 
     		function (data) {
         		this.registerNewPlayer(JSON.parse(data.body));
+        	}.bind(this)
+        );
+        stompClient.subscribe(
+    		'/topic/unregisterPlayer', 
+    		function (data) {
+        		this.unregisterPlayer(data.body);
         	}.bind(this)
         );
         stompClient.subscribe(
