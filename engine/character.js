@@ -42,7 +42,9 @@ function Character(id, spritesCanvas, animationData, spriteWidth, spriteHeight, 
 						direction = 3; 
 						break;
 				}
-				this.move(direction);
+				if(direction != null){
+					this.move(direction);
+				}	
 			}.bind(this)
 		);
 		$window.addEventListener(

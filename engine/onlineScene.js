@@ -26,7 +26,7 @@ function OnlineScene(sceneFactory, hci){
 	this.registerNewPlayer = function(data){
 		var character = this._sceneFactory.createAnimatedElementFromServerData(data);
 		this._animatedElements[character._id] = character;
-		this._hci.messagesOutput.innerHTML += character.name + ' joined the game.<br/>';
+		this.windowManager.addPlayer(character);
 	};
 
 	/**
@@ -35,9 +35,9 @@ function OnlineScene(sceneFactory, hci){
 	 * @return {None}
 	 */
 	this.unregisterPlayer = function(characterId){
-		var playerToRemove = this._animatedElements[characterId];
+		var player = this._animatedElements[characterId];
 		delete this._animatedElements[characterId];
-		this._hci.messagesOutput.innerHTML += playerToRemove.name + ' quit the game.<br/>';
+		this.windowManager.removePlayer(player);
 	};
 
 	/**
@@ -84,6 +84,12 @@ function OnlineScene(sceneFactory, hci){
         		console.log(data);
         	}.bind(this)
         );
+        stompClient.subscribe(
+        	"/user/queue/chat",
+        	function (data) {
+        		this.windowManager.displayMessage(data.body);
+        	}.bind(this)
+        );
 	}
 
 	/**
@@ -97,27 +103,16 @@ function OnlineScene(sceneFactory, hci){
 				url="/app/movePlayer";
 				break;
 			}
+			case 'sendMessage':  {
+				url="/app/chat";
+				break;
+			}
 		}
 		if(url != null){
 			this.stompClient.send(url, {}, JSON.stringify(event.data));
 		}else{
 			console.log('Local-event could not be identified.');
 		}	
-	}
-
-	/**
-	 * initialize the listener for the chat input. Basically, if the enter key is pressed, it parses  the
-	 * input's text. If it is in the right format, it sends it to the server.
-	 * TODO: set the destination-list from a more intuitive component (autocomplete select)
-	 * @param  {HTML input element} chatInputElement the HTML element
-	 */
-	this.createChatListener = function(chatInputElement){
-		let chatMessageRegex = /(\[*\])/;
-		chatInputElement.onkeypress = function(e){
-			if(e.keyCode == 13){
-				var chatMessage = chatMessageRegex.exec(chatInputElement.text);
-			}
-		};
 	}
 }
 //inherit the OnlineScene object from Scene object

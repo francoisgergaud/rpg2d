@@ -29,6 +29,7 @@ function gameBootstrap(guiElements, username, engineInitializationSuccessCallbac
 			var animatedElementFactory = new AnimatedElementFactory();
 			var characterFactory = new CharacterFactory();
 			var stompClientFactory = new StompClientFactory();
+			var windowManagerFactory = new WindowManagerFactory();
 			// define the playable-character's appareance randomly
 			var characterId = Math.floor(Math.random() * 8);
 			// create the game-engine
@@ -47,7 +48,8 @@ function gameBootstrap(guiElements, username, engineInitializationSuccessCallbac
 				scrollingBufferFactory: scrollingBufferFactory,
 				animatedElementFactory: animatedElementFactory,
 				characterFactory: characterFactory,
-				stompClientFactory: stompClientFactory
+				stompClientFactory: stompClientFactory,
+				windowManagerFactory: windowManagerFactory
 			}
 			var resources = {
 				charactersCanvas: charactersSpritesCanvas,
@@ -64,6 +66,8 @@ function gameBootstrap(guiElements, username, engineInitializationSuccessCallbac
 				connectionMessagesOutput: guiElements.connectionMessages,
 				messagesOutput: guiElements.messageOutput,
 				chatInput: guiElements.chatInput,
+				playerListSelect: guiElements.playerListSelect,
+				sendButton: guiElements.sendButton,
 				engineInitializationSuccessCallback: engineInitializationSuccessCallback
 			}
 

@@ -18,7 +18,7 @@
 		<script type="text/javascript" src="./engine/camera.js"></script>
 		<script type="text/javascript" src="./engine/scrollingCanvasBuffer.js"></script>
 		<script type="text/javascript" src="./engine/engine.js"></script>
-		<script type="text/javascript" src="./engine/serverConnector.js"></script>
+		<script type="text/javascript" src="./engine/windowManager.js"></script>
 		<script type="text/javascript" src="./main.js"></script>
 		<link rel="stylesheet" type="text/css" href="./engine/3rdLibs/pure-min.js"></link>
 	</head>
@@ -43,15 +43,15 @@
 			    </div>
 			</div>
 			<div class="pure-g">
-			    <div class="pure-u-3-3">
-			    	<form class="pure-form">
+				<div class="pure-u-2-3">
+				    <form class="pure-form">
 						<fieldset>
-							<select id="players"/>
+							<select id="players" multiple/>
 					    	<input type="text" id="chatInput" placeholder="message">
-					    	<button type="button" class="pure-button pure-button-primary">Send</button>
+					    	<button type="button" class="pure-button pure-button-primary" id="send">Send</button>
 					    </fieldset>
 					</form>
-			    </div>
+				</div>
 			</div>
 			<script type="text/javascript">
 				/**
@@ -70,7 +70,9 @@
 					gameBootstrap(
 						{
 							canvas: document.getElementById("canvas"),
-							chatInput: document.getElementById("chatInput"), 
+							playerListSelect: document.getElementById("players"),
+							chatInput: document.getElementById("chatInput"),
+							sendButton: document.getElementById("send"),
 							messageOutput: document.getElementById("messagesOutput"),
 							connectionMessages: document.getElementById('connectionMessages')
 						},

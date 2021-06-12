@@ -30,7 +30,7 @@
  */
 function Engine (factories, sceneConfiguration, resources, hci){
 	this._displayCanvas = hci.canvas;
-	this._messageComponent = hci.messageComponent;
+	this._hci = hci;
 	this._animationInterval = sceneConfiguration.animationPeriod;
 
 	/**
@@ -48,11 +48,12 @@ function Engine (factories, sceneConfiguration, resources, hci){
 		.then(
 			function(scene){
 				this._scene = scene;
-				//scene.createChatListener(hci.chatInput);
 				//create the camera and its view-port
-				this._camera = factories.cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, this._scene);
+				this._camera = factories.cameraFactory.createCamera({x:0,y:0,width: viewPortWidth, height: viewPortHeight}, scene);
 				//create the scrolling-buffer
-				this._backgroundBuffer = factories.scrollingBufferFactory.createScrollingBuffer(this._scene._environment, this._displayCanvas.width, this._displayCanvas.height, this._camera);
+				this._backgroundBuffer = factories.scrollingBufferFactory.createScrollingBuffer(scene._environment, this._displayCanvas.width, this._displayCanvas.height, this._camera);
+				// build the window-manager
+				scene.windowManager = factories.windowManagerFactory.createWindowManager(this._hci, this);
 				// invoke any callback provided	
 				hci.engineInitializationSuccessCallback();
 				// start the main-loop
